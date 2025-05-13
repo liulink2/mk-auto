@@ -244,14 +244,12 @@ export default function SuppliersPage() {
         </Button>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <Table
-          columns={columns}
-          dataSource={suppliers}
-          rowKey="id"
-          loading={loading}
-        />
-      </div>
+      <Table
+        columns={columns}
+        dataSource={suppliers}
+        rowKey="id"
+        loading={loading}
+      />
 
       <Modal
         title={editingSupplier ? "Edit Supplier" : "Add Supplier"}

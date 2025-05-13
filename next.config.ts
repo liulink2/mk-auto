@@ -9,10 +9,6 @@ const nextConfig: NextConfig = {
     pagesBufferLength: 2,
   },
   reactStrictMode: true,
-  // Disable the development overlay
-  devServer: {
-    overlay: false,
-  },
   devIndicators: false,
 };
 
