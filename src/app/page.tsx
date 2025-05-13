@@ -1,26 +1,29 @@
 "use client";
 
 import { Button, Card } from "antd";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push("/login");
-  };
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
 
   return (
     <div className="min-h-screen p-8">
-      <Card title="Welcome" className="max-w-md mx-auto">
+      <Card title="Welcome to MK Auto" className="max-w-md mx-auto">
         <div className="space-y-4">
-          <p>Username: {session?.user?.username}</p>
-          <p>Role: {session?.user?.role}</p>
-          <Button type="primary" danger onClick={handleLogout} block>
-            Logout
+          <p className="text-center text-gray-600">
+            Please log in to access the system
+          </p>
+          <Button type="primary" onClick={() => router.push("/login")} block>
+            Login
           </Button>
         </div>
       </Card>

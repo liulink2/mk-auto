@@ -1,0 +1,94 @@
+"use client";
+
+import { Layout, Menu } from "antd";
+import {
+  DashboardOutlined,
+  UserOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
+
+const { Header, Sider, Content } = Layout;
+
+interface AppLayoutProps {
+  children: ReactNode;
+}
+
+export default function AppLayout({ children }: AppLayoutProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const menuItems = [
+    {
+      key: "dashboard",
+      icon: <DashboardOutlined />,
+      label: "Dashboard",
+      onClick: () => router.push("/dashboard"),
+    },
+    {
+      key: "users",
+      icon: <UserOutlined />,
+      label: "Users",
+      onClick: () => router.push("/users"),
+    },
+    {
+      key: "settings",
+      icon: <SettingOutlined />,
+      label: "Settings",
+      onClick: () => router.push("/settings"),
+    },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: () => signOut(),
+    },
+  ];
+
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Sider
+        theme="light"
+        breakpoint="lg"
+        collapsedWidth="0"
+        style={{
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+        }}
+      >
+        <div className="p-4 text-center">
+          <h1 className="text-xl font-bold">MK Auto</h1>
+        </div>
+        <Menu
+          mode="inline"
+          defaultSelectedKeys={["dashboard"]}
+          items={menuItems}
+        />
+      </Sider>
+      <Layout>
+        <Header
+          style={{
+            padding: "0 24px",
+            background: "#fff",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+          }}
+        >
+          <div className="flex justify-end items-center h-full">
+            <span className="mr-4">Welcome, {session.user?.username}</span>
+          </div>
+        </Header>
+        <Content
+          style={{ margin: "24px 16px", padding: 24, background: "#fff" }}
+        >
+          {children}
+        </Content>
+      </Layout>
+    </Layout>
+  );
+}
