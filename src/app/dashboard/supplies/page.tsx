@@ -53,7 +53,6 @@ interface Supply {
   suppliedDate: string;
   createdAt: string;
   updatedAt: string;
-  items?: SupplyItem[];
 }
 
 interface SupplyFormValues {
@@ -230,46 +229,35 @@ export default function SupplyManagementPage() {
       render: (date: string) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: "Invoice Number",
-      dataIndex: "invoiceNumber",
-      key: "invoiceNumber",
-    },
-    {
       title: "Supplier",
       dataIndex: ["supplier", "name"],
       key: "supplier",
     },
     {
-      title: "Items",
-      key: "items",
-      render: (_, record) => (
-        <ul className="list-disc pl-4">
-          {record.items?.map((item: any, index: number) => (
-            <li key={index} className="flex items-center gap-2">
-              <span>
-                {item.name} - {item.quantity} x ${item.price}
-              </span>
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => showEditSupplyModal(record)}
-                title="Edit Supply"
-              />
-            </li>
-          ))}
-        </ul>
-      ),
+      title: "Invoice Number",
+      dataIndex: "invoiceNumber",
+      key: "invoiceNumber",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Qty",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
     },
     {
       title: "Total",
       key: "total",
       render: (_, record) => {
-        const total =
-          record.items?.reduce(
-            (sum: number, item: any) => sum + item.quantity * item.price,
-            0
-          ) ?? 0;
+        const total = record.quantity * record.price;
         return new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD",
