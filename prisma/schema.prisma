@@ -18,6 +18,11 @@ enum Role {
   MANAGER
 }
 
+enum PaymentType {
+  CASH
+  CARD
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -78,6 +83,23 @@ model Supplier {
   children  Supplier[] @relation("SupplierHierarchy")
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  supplies  Supply[]
 
   @@index([parentId])
+}
+
+model Supply {
+  id            String      @id @default(cuid())
+  supplierId    String
+  supplier      Supplier    @relation(fields: [supplierId], references: [id])
+  invoiceNumber String
+  name          String
+  description   String?
+  quantity      Int
+  price         Decimal
+  paymentType   PaymentType
+  remarks       String?
+  suppliedDate  DateTime
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
