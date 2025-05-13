@@ -32,19 +32,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
       key: "users",
       icon: <UserOutlined />,
       label: "Users",
-      onClick: () => router.push("/users"),
+      onClick: () => router.push("/dashboard/users"),
     },
     {
       key: "settings",
       icon: <SettingOutlined />,
       label: "Settings",
-      onClick: () => router.push("/settings"),
-    },
-    {
-      key: "logout",
-      icon: <LogoutOutlined />,
-      label: "Logout",
-      onClick: () => signOut(),
+      onClick: () => router.push("/dashboard/settings"),
     },
   ];
 
@@ -60,6 +54,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
         collapsedWidth="0"
         style={{
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
         }}
       >
         <div className="p-4 text-center">
@@ -69,7 +66,30 @@ export default function AppLayout({ children }: AppLayoutProps) {
           mode="inline"
           defaultSelectedKeys={["dashboard"]}
           items={menuItems}
+          style={{ flex: 1 }}
         />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            borderTop: "1px solid #f0f0f0",
+            background: "#fff",
+          }}
+        >
+          <Menu
+            mode="inline"
+            items={[
+              {
+                key: "logout",
+                icon: <LogoutOutlined />,
+                label: "Logout",
+                onClick: () => signOut(),
+              },
+            ]}
+          />
+        </div>
       </Sider>
       <Layout>
         <Header

@@ -7,8 +7,10 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const [messageApi, contextHolder] = message.useMessage();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
 
   const onFinish = async (values: { username: string; password: string }) => {
     try {
@@ -20,14 +22,15 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        message.error("Invalid credentials");
+        messageApi.error(result.error);
+        form.setFieldsValue({ password: "" });
         return;
       }
 
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
-      message.error("An error occurred");
+      messageApi.error("An error occurred during login");
     } finally {
       setLoading(false);
     }
@@ -35,8 +38,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      {contextHolder}
       <Card title="Login" className="w-full max-w-md">
         <Form
+          form={form}
           name="login"
           onFinish={onFinish}
           layout="vertical"

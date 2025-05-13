@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth/next";
+import { Role } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -29,6 +30,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
+        if (!user.isActive) {
+          throw new Error("Account is disabled. Please contact administrator.");
+        }
+
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
           user.password
@@ -49,6 +54,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.username = user.username;
         token.role = user.role;
       }
@@ -56,8 +62,9 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.username = token.username;
-        session.user.role = token.role;
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.role = token.role as Role;
       }
       return session;
     },

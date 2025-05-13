@@ -46,17 +46,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  username      String    @unique
-  password      String
-  name          String?
-  image         String?
-  role          Role      @default(MANAGER)
-  accounts      Account[]
-  sessions      Session[]
-  posts         Post[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  username  String    @unique
+  password  String
+  name      String?
+  image     String?
+  role      Role      @default(MANAGER)
+  isActive  Boolean   @default(true)
+  accounts  Account[]
+  sessions  Session[]
+  posts     Post[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([username])
 }
