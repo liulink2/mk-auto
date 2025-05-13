@@ -55,7 +55,6 @@ model User {
   isActive  Boolean   @default(true)
   accounts  Account[]
   sessions  Session[]
-  posts     Post[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -70,13 +69,15 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
+model Supplier {
+  id        String     @id @default(cuid())
+  name      String
+  isActive  Boolean    @default(true)
+  parentId  String?
+  parent    Supplier?  @relation("SupplierHierarchy", fields: [parentId], references: [id])
+  children  Supplier[] @relation("SupplierHierarchy")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([parentId])
 }
