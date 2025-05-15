@@ -15,6 +15,7 @@ import {
   message,
   Tag,
   Popconfirm,
+  AutoComplete,
 } from "antd";
 import {
   PlusOutlined,
@@ -24,6 +25,7 @@ import {
   CheckOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { debounce } from "lodash";
 
 interface CarServiceItem {
   id: string;
@@ -58,6 +60,7 @@ export default function CarServicesPage() {
   );
   const [form] = Form.useForm();
   const [selectedMonthYear, setSelectedMonthYear] = useState(dayjs());
+  const [supplyNames, setSupplyNames] = useState<string[]>([]);
 
   const fetchCarServices = async () => {
     try {
@@ -73,6 +76,22 @@ export default function CarServicesPage() {
       message.error("Failed to fetch car services");
     }
   };
+
+  // Debounce the supply name fetching
+  const debouncedFetchSupplyNames = debounce(async (searchText: string) => {
+    if (!searchText || searchText.length < 3) return;
+    try {
+      const response = await fetch(`/api/supplies/names?search=${searchText}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch supply names");
+      }
+      const data = await response.json();
+      setSupplyNames(data.map((supply: any) => supply.name));
+    } catch (error) {
+      console.error("Failed to fetch supply names:", error);
+      message.error("Failed to fetch supply names");
+    }
+  }, 300);
 
   useEffect(() => {
     fetchCarServices();
@@ -422,7 +441,21 @@ export default function CarServicesPage() {
                         rules={[{ required: true, message: "Missing name" }]}
                         className="col-span-6"
                       >
-                        <Input placeholder="Name" />
+                        {form.getFieldValue([
+                          "carServiceItems",
+                          name,
+                          "serviceType",
+                        ]) === "PARTS" ? (
+                          <AutoComplete
+                            options={supplyNames.map((name) => ({
+                              value: name,
+                            }))}
+                            placeholder="Name"
+                            onSearch={debouncedFetchSupplyNames}
+                          />
+                        ) : (
+                          <Input placeholder="Name" />
+                        )}
                       </Form.Item>
                       <Form.Item
                         {...restField}
