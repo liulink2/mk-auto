@@ -317,7 +317,7 @@ export default function CarServicesPage() {
         dataSource={carServices}
         columns={columns}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
+        pagination={false}
       />
 
       <Modal
