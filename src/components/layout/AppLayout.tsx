@@ -11,7 +11,7 @@ import {
   DollarOutlined,
 } from "@ant-design/icons";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 const { Header, Sider, Content } = Layout;
@@ -23,6 +23,7 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   const menuItems = [
     {
@@ -67,6 +68,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
     return null;
   }
 
+  // Get the current section from the pathname
+  const currentSection = pathname.split("/")[2] || "dashboard";
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -85,7 +89,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
         <Menu
           mode="inline"
-          defaultSelectedKeys={["dashboard"]}
+          selectedKeys={[currentSection]}
           items={menuItems}
           style={{ flex: 1 }}
         />
