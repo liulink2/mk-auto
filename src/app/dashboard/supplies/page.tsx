@@ -501,12 +501,7 @@ export default function SupplyManagementPage() {
                         ]}
                         className="col-span-1"
                       >
-                        <InputNumber
-                          min={0}
-                          step={0.01}
-                          style={{ width: "100%" }}
-                          prefix="$"
-                        />
+                        <InputNumber style={{ width: "100%" }} prefix="$" />
                       </Form.Item>
                       <Form.Item
                         {...restField}
@@ -515,8 +510,6 @@ export default function SupplyManagementPage() {
                         className="col-span-2"
                       >
                         <InputNumber
-                          min={0}
-                          step={0.01}
                           style={{ width: "100%" }}
                           disabled
                           prefix="$"

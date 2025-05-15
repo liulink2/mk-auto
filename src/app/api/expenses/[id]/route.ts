@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 // PUT /api/expenses/:id
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
+  const id = await params.id;
   try {
     const body = await request.json();
     const expense = await prisma.expense.update({
-      where: { id: context.params.id },
+      where: { id },
       data: {
         ...body,
         month: new Date(body.issuedDate).getMonth() + 1,
@@ -28,11 +29,12 @@ export async function PUT(
 // DELETE /api/expenses/:id
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
+  const { id } = await params;
   try {
     await prisma.expense.delete({
-      where: { id: context.params.id },
+      where: { id },
     });
     return NextResponse.json({ message: "Expense deleted successfully" });
   } catch (error) {

@@ -16,6 +16,7 @@ import {
   Popconfirm,
   message,
   Typography,
+  Divider,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -275,6 +276,8 @@ export default function ExpenseManagementPage() {
         </div>
       </Card>
 
+      <Divider />
+
       <Table
         columns={columns}
         dataSource={expenses}
@@ -325,12 +328,7 @@ export default function ExpenseManagementPage() {
               rules={[{ required: true, message: "Please enter amount" }]}
               className="col-span-6"
             >
-              <InputNumber
-                min={0}
-                step={0.01}
-                style={{ width: "100%" }}
-                prefix="$"
-              />
+              <InputNumber style={{ width: "100%" }} prefix="$" />
             </Form.Item>
 
             <Form.Item
