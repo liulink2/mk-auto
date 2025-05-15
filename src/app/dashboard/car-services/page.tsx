@@ -177,23 +177,6 @@ export default function CarServicesPage() {
 
   const columns = [
     {
-      title: "Status",
-      key: "status",
-      render: (_: any, record: CarService) => {
-        return (
-          <>
-            {!record.carOutDateTime ? (
-              <Tag color="green">Active</Tag>
-            ) : (
-              <Tag color="blue">Completed</Tag>
-            )}
-            {record.totalAmount - record.paidInCash - record.paidInCard !==
-              0 && <Tag color="red">Payment</Tag>}
-          </>
-        );
-      },
-    },
-    {
       title: "Car Plate",
       dataIndex: "carPlate",
       key: "carPlate",
@@ -244,6 +227,23 @@ export default function CarServicesPage() {
       dataIndex: "paidInCard",
       key: "paidInCard",
       render: (text: number) => `$${text.toFixed(2)}`,
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (_: any, record: CarService) => {
+        return (
+          <>
+            {!record.carOutDateTime ? (
+              <Tag color="green">Active</Tag>
+            ) : (
+              <Tag color="blue">Completed</Tag>
+            )}
+            {record.totalAmount - record.paidInCash - record.paidInCard !==
+              0 && <Tag color="red">Payment</Tag>}
+          </>
+        );
+      },
     },
     {
       title: "Actions",
