@@ -15,6 +15,8 @@ export async function PUT(
         invoiceNumber: data.invoiceNumber,
         supplierId: data.supplierId,
         suppliedDate: new Date(data.suppliedDate),
+        month: new Date(data.suppliedDate).getMonth() + 1,
+        year: new Date(data.suppliedDate).getFullYear(),
         paymentType: data.paymentType,
         remarks: data.remarks,
         name: data.name,

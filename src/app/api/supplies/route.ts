@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 // GET /api/supplies
 export async function GET(request: NextRequest) {
@@ -9,13 +7,27 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
+    const month = searchParams.get("month");
+    const year = searchParams.get("year");
 
     const supplies = await prisma.supply.findMany({
       where: {
-        suppliedDate: {
-          gte: startDate ? new Date(startDate) : undefined,
-          lte: endDate ? new Date(endDate) : undefined,
-        },
+        AND: [
+          startDate && endDate
+            ? {
+                suppliedDate: {
+                  gte: new Date(startDate),
+                  lte: new Date(endDate),
+                },
+              }
+            : {},
+          month && year
+            ? {
+                month: parseInt(month),
+                year: parseInt(year),
+              }
+            : {},
+        ],
       },
       include: { supplier: true },
       orderBy: {

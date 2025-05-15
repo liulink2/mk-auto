@@ -100,6 +100,10 @@ model Supply {
   paymentType   PaymentType
   remarks       String?
   suppliedDate  DateTime
+  month         Int
+  year          Int
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@index([month, year])
 }

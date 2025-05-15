@@ -87,12 +87,10 @@ export default function SupplyManagementPage() {
   const fetchSupplies = async () => {
     try {
       setLoading(true);
-      const startDate = date.startOf("month").toISOString();
-      const endDate = date.endOf("month").toISOString();
+      const month = date.month() + 1; // dayjs months are 0-based
+      const year = date.year();
 
-      const response = await fetch(
-        `/api/supplies?startDate=${startDate}&endDate=${endDate}`
-      );
+      const response = await fetch(`/api/supplies?month=${month}&year=${year}`);
       if (!response.ok) {
         throw new Error("Failed to fetch supplies");
       }
