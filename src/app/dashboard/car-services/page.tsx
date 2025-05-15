@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Table,
   Button,
@@ -267,6 +267,29 @@ export default function CarServicesPage() {
     },
   ];
 
+  const summary = useMemo(() => {
+    const totalServices = carServices.length;
+    const totalAmount = carServices.reduce(
+      (sum, service) => sum + service.totalAmount,
+      0
+    );
+    const totalCash = carServices.reduce(
+      (sum, service) => sum + service.paidInCash,
+      0
+    );
+    const totalCard = carServices.reduce(
+      (sum, service) => sum + service.paidInCard,
+      0
+    );
+
+    return {
+      totalServices,
+      totalAmount,
+      totalCash,
+      totalCard,
+    };
+  }, [carServices]);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -281,6 +304,13 @@ export default function CarServicesPage() {
             Add Car Service
           </Button>
         </Space>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        <Card title="Total Services">{summary.totalServices}</Card>
+        <Card title="Total Amount">${summary.totalAmount.toFixed(2)}</Card>
+        <Card title="Paid in Cash">${summary.totalCash.toFixed(2)}</Card>
+        <Card title="Paid in Card">${summary.totalCard.toFixed(2)}</Card>
       </div>
 
       <Table
@@ -313,6 +343,14 @@ export default function CarServicesPage() {
             </Form.Item>
 
             <Form.Item
+              name="carDetails"
+              label="Car Details"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
               name="ownerName"
               label="Owner Name"
               rules={[{ required: true }]}
@@ -337,15 +375,46 @@ export default function CarServicesPage() {
             </Form.Item>
 
             <Form.Item name="carOutDateTime" label="Car Out Date Time">
-              <DatePicker showTime format="YYYY-MM-DD HH:mm" />
+              <DatePicker showTime format="DD-MM-YYYY HH:mm" />
             </Form.Item>
 
             <Form.Item
-              name="carDetails"
-              label="Car Details"
-              className="col-span-3"
+              name="totalAmount"
+              label="Total Amount"
+              rules={[{ required: true }]}
             >
-              <Input />
+              <InputNumber
+                min={0}
+                step={0.01}
+                style={{ width: "100%" }}
+                prefix="$"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="paidInCash"
+              label="Paid in Cash"
+              rules={[{ required: true }]}
+            >
+              <InputNumber
+                min={0}
+                step={0.01}
+                style={{ width: "100%" }}
+                prefix="$"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="paidInCard"
+              label="Paid in Card"
+              rules={[{ required: true }]}
+            >
+              <InputNumber
+                min={0}
+                step={0.01}
+                style={{ width: "100%" }}
+                prefix="$"
+              />
             </Form.Item>
           </div>
 
@@ -440,16 +509,7 @@ export default function CarServicesPage() {
               />
             </Form.Item>
           </div>
-          <div className="flex gap-4 justify-end items-center">
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={() => {
-                form.setFieldsValue({
-                  paidInCash: form.getFieldValue("totalAmount"),
-                });
-              }}
-            />
+          <div className="flex gap-4 justify-end">
             <Form.Item
               name="paidInCash"
               label="Paid in Cash"
@@ -457,17 +517,7 @@ export default function CarServicesPage() {
             >
               <InputNumber style={{ width: "100%" }} prefix="$" />
             </Form.Item>
-          </div>
-          <div className="flex gap-4 justify-end items-center">
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={() => {
-                form.setFieldsValue({
-                  paidInCard: form.getFieldValue("totalAmount"),
-                });
-              }}
-            />
+
             <Form.Item
               name="paidInCard"
               label="Paid in Card"
