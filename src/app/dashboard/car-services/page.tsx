@@ -197,6 +197,7 @@ export default function CarServicesPage() {
       title: "Car Plate",
       dataIndex: "carPlate",
       key: "carPlate",
+      render: (text: string) => <Tag color="default">{text.toUpperCase()}</Tag>,
     },
     {
       title: "Car Details",
@@ -290,6 +291,13 @@ export default function CarServicesPage() {
     };
   }, [carServices]);
 
+  const activeCarServices = carServices.filter(
+    (service) => !service.carOutDateTime
+  );
+  const completedCarServices = carServices.filter(
+    (service) => service.carOutDateTime
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -313,8 +321,17 @@ export default function CarServicesPage() {
         <Card title="Paid in Card">${summary.totalCard.toFixed(2)}</Card>
       </div>
 
+      <h2 className="text-xl font-bold mt-4">Active Car Service</h2>
       <Table
-        dataSource={carServices}
+        dataSource={activeCarServices}
+        columns={columns}
+        rowKey="id"
+        pagination={false}
+      />
+
+      <h2 className="text-xl font-bold mt-4">Completed Car Service</h2>
+      <Table
+        dataSource={completedCarServices}
         columns={columns}
         rowKey="id"
         pagination={false}
@@ -337,14 +354,6 @@ export default function CarServicesPage() {
             <Form.Item
               name="carPlate"
               label="Car Plate"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="carDetails"
-              label="Car Details"
               rules={[{ required: true }]}
             >
               <Input />
@@ -379,42 +388,11 @@ export default function CarServicesPage() {
             </Form.Item>
 
             <Form.Item
-              name="totalAmount"
-              label="Total Amount"
-              rules={[{ required: true }]}
+              name="carDetails"
+              label="Car Details"
+              className="col-span-3"
             >
-              <InputNumber
-                min={0}
-                step={0.01}
-                style={{ width: "100%" }}
-                prefix="$"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="paidInCash"
-              label="Paid in Cash"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                min={0}
-                step={0.01}
-                style={{ width: "100%" }}
-                prefix="$"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="paidInCard"
-              label="Paid in Card"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                min={0}
-                step={0.01}
-                style={{ width: "100%" }}
-                prefix="$"
-              />
+              <Input />
             </Form.Item>
           </div>
 
@@ -509,7 +487,16 @@ export default function CarServicesPage() {
               />
             </Form.Item>
           </div>
-          <div className="flex gap-4 justify-end">
+          <div className="flex gap-4 justify-end items-center">
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={() => {
+                form.setFieldsValue({
+                  paidInCash: form.getFieldValue("totalAmount"),
+                });
+              }}
+            />
             <Form.Item
               name="paidInCash"
               label="Paid in Cash"
@@ -517,7 +504,17 @@ export default function CarServicesPage() {
             >
               <InputNumber style={{ width: "100%" }} prefix="$" />
             </Form.Item>
-
+          </div>
+          <div className="flex gap-4 justify-end items-center">
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={() => {
+                form.setFieldsValue({
+                  paidInCard: form.getFieldValue("totalAmount"),
+                });
+              }}
+            />
             <Form.Item
               name="paidInCard"
               label="Paid in Card"
