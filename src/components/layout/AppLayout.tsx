@@ -8,6 +8,7 @@ import {
   LogoutOutlined,
   ShopOutlined,
   ShoppingCartOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -47,6 +48,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
       icon: <ShoppingCartOutlined />,
       label: "Supplies",
       onClick: () => router.push("/dashboard/supplies"),
+    },
+    {
+      key: "expenses",
+      icon: <DollarOutlined />,
+      label: "Expenses",
+      onClick: () => router.push("/dashboard/expenses"),
     },
     {
       key: "settings",

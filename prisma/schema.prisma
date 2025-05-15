@@ -107,3 +107,18 @@ model Supply {
 
   @@index([month, year])
 }
+
+model Expense {
+  id          String   @id @default(cuid())
+  name        String
+  issuedDate  DateTime
+  month       Int
+  year        Int
+  amount      Float
+  paymentType String   // CASH or CARD
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([month, year])
+}
