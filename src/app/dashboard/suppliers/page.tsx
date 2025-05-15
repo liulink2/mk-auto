@@ -249,6 +249,10 @@ export default function SuppliersPage() {
         dataSource={suppliers}
         rowKey="id"
         loading={loading}
+        expandable={{
+          rowExpandable: () => false,
+          expandedRowRender: () => null,
+        }}
       />
 
       <Modal

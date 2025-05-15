@@ -17,6 +17,7 @@ import {
   message,
   Divider,
   Typography,
+  Collapse,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -40,6 +41,8 @@ interface SupplyItem {
 interface Supplier {
   id: string;
   name: string;
+  parent?: Supplier;
+  children: Supplier[];
 }
 
 interface Supply {
@@ -74,8 +77,8 @@ export default function SupplyManagementPage() {
   const [loading, setLoading] = useState(true);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isSummaryModalVisible, setIsSummaryModalVisible] = useState(false);
   const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
-  const [editingItem, setEditingItem] = useState<SupplyItem | null>(null);
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
@@ -148,7 +151,6 @@ export default function SupplyManagementPage() {
     setIsEditModalVisible(false);
     editForm.resetFields();
     setEditingSupply(null);
-    setEditingItem(null);
   };
 
   const handleSubmit = async (values: SupplyFormValues) => {
@@ -343,7 +345,10 @@ export default function SupplyManagementPage() {
           </div>
           <div>
             <Text type="secondary">Total Amount</Text>
-            <div className="text-2xl font-bold">
+            <div
+              className="text-2xl font-bold cursor-pointer text-blue-500"
+              onClick={() => setIsSummaryModalVisible(true)}
+            >
               {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "USD",
@@ -413,10 +418,12 @@ export default function SupplyManagementPage() {
               className="col-span-4"
             >
               <Select
-                options={suppliers.map((s) => ({
-                  label: s.name,
-                  value: s.id,
-                }))}
+                options={suppliers
+                  .filter((supplier) => supplier.children.length === 0)
+                  .map((s) => ({
+                    label: `${s.name} ${s.parent ? `(${s.parent.name})` : ""}`,
+                    value: s.id,
+                  }))}
               />
             </Form.Item>
 
@@ -441,74 +448,78 @@ export default function SupplyManagementPage() {
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name, ...restField }) => (
-                  <div key={key} className="grid grid-cols-12 gap-4 mb-1">
-                    <Form.Item
-                      {...restField}
-                      name={[name, "name"]}
-                      label="Name"
-                      rules={[
-                        { required: true, message: "Please enter item name" },
-                      ]}
-                      className="col-span-7"
-                    >
-                      <Input />
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "quantity"]}
-                      label="Quantity"
-                      rules={[
-                        { required: true, message: "Please input quantity!" },
-                      ]}
-                      className="col-span-1"
-                    >
-                      <InputNumber
-                        min={1}
-                        style={{ width: "100%" }}
-                        parser={(value: string | undefined) =>
-                          value ? parseInt(value) : 0
-                        }
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "price"]}
-                      label="Price"
-                      rules={[
-                        { required: true, message: "Please input price!" },
-                      ]}
-                      className="col-span-1"
-                    >
-                      <InputNumber
-                        min={0}
-                        step={0.01}
-                        style={{ width: "100%" }}
-                        prefix="$"
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "amount"]}
-                      label="Amount"
-                      className="col-span-2"
-                    >
-                      <InputNumber
-                        min={0}
-                        step={0.01}
-                        style={{ width: "100%" }}
-                        disabled
-                        prefix="$"
-                      />
-                    </Form.Item>
-                    {fields.length > 1 && (
-                      <Button
-                        type="text"
-                        danger
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => remove(name)}
-                        className="mt-8 col-span-1"
-                      />
-                    )}
+                  <div key={key} className="flex">
+                    <div className="grid grid-cols-12 gap-4 mb-1">
+                      <Form.Item
+                        {...restField}
+                        name={[name, "name"]}
+                        label="Name"
+                        rules={[
+                          { required: true, message: "Please enter item name" },
+                        ]}
+                        className="col-span-8"
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "quantity"]}
+                        label="Quantity"
+                        rules={[
+                          { required: true, message: "Please input quantity!" },
+                        ]}
+                        className="col-span-1"
+                      >
+                        <InputNumber
+                          min={1}
+                          style={{ width: "100%" }}
+                          parser={(value: string | undefined) =>
+                            value ? parseInt(value) : 0
+                          }
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "price"]}
+                        label="Price"
+                        rules={[
+                          { required: true, message: "Please input price!" },
+                        ]}
+                        className="col-span-1"
+                      >
+                        <InputNumber
+                          min={0}
+                          step={0.01}
+                          style={{ width: "100%" }}
+                          prefix="$"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "amount"]}
+                        label="Amount"
+                        className="col-span-2"
+                      >
+                        <InputNumber
+                          min={0}
+                          step={0.01}
+                          style={{ width: "100%" }}
+                          disabled
+                          prefix="$"
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      {fields.length > 1 && (
+                        <Button
+                          type="text"
+                          danger
+                          icon={<MinusCircleOutlined />}
+                          onClick={() => remove(name)}
+                          className="mt-8 col-span-1"
+                        />
+                      )}
+                    </div>
                   </div>
                 ))}
                 <Form.Item>
@@ -654,6 +665,105 @@ export default function SupplyManagementPage() {
             </Space>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Payment Summary"
+        open={isSummaryModalVisible}
+        onCancel={() => setIsSummaryModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        <div className="space-y-6">
+          <div>
+            <Text strong className="text-lg block mb-4">
+              Payment Type Summary
+            </Text>
+            <div className="grid grid-cols-2 gap-4">
+              {Object.entries(
+                supplies.reduce((acc: { [key: string]: number }, supply) => {
+                  const amount = supply.quantity * supply.price;
+                  acc[supply.paymentType] =
+                    (acc[supply.paymentType] || 0) + amount;
+                  return acc;
+                }, {})
+              ).map(([type, amount]) => (
+                <div key={type} className="border rounded p-4">
+                  <Text className="block mb-2">{type}</Text>
+                  <Text strong className="text-lg">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(amount)}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Divider />
+
+          <div>
+            <Text strong className="text-lg block mb-4">
+              Supplier Summary
+            </Text>
+            {Object.entries(
+              supplies.reduce(
+                (
+                  acc: {
+                    [key: string]: {
+                      total: number;
+                      children: { [key: string]: number };
+                    };
+                  },
+                  supply
+                ) => {
+                  const supplier = supply.supplier;
+                  const parentName =
+                    supplier.parent?.name || "Independent Suppliers";
+                  const amount = supply.quantity * supply.price;
+
+                  if (!acc[parentName]) {
+                    acc[parentName] = { total: 0, children: {} };
+                  }
+
+                  acc[parentName].total += amount;
+                  acc[parentName].children[supplier.name] =
+                    (acc[parentName].children[supplier.name] || 0) + amount;
+
+                  return acc;
+                },
+                {}
+              )
+            ).map(([parent, data]) => (
+              <div key={parent} className="border-b pb-2 last:border-b-0">
+                <div className="flex justify-between items-center mb-2">
+                  <Text strong>{parent}</Text>
+                  <Text strong>
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(data.total)}
+                  </Text>
+                </div>
+                {Object.entries(data.children).map(([supplier, amount]) => (
+                  <div
+                    key={supplier}
+                    className="flex justify-between items-center pl-4 text-sm"
+                  >
+                    <Text type="secondary">{supplier}</Text>
+                    <Text type="secondary">
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(amount)}
+                    </Text>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </Modal>
     </div>
   );

@@ -29,7 +29,13 @@ export async function GET(request: NextRequest) {
             : {},
         ],
       },
-      include: { supplier: true },
+      include: {
+        supplier: {
+          include: {
+            parent: true,
+          },
+        },
+      },
       orderBy: {
         suppliedDate: "desc",
       },

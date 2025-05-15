@@ -15,6 +15,10 @@ export async function GET() {
       orderBy: {
         name: "asc",
       },
+      include: {
+        parent: true,
+        children: true,
+      },
     });
 
     return NextResponse.json(suppliers);
