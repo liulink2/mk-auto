@@ -244,6 +244,7 @@ export default function SupplyManagementPage() {
       dataIndex: "suppliedDate",
       key: "suppliedDate",
       render: (date: string) => dayjs(date).format("DD/MM/YYYY"),
+      width: 100,
     },
     {
       title: "Supplier",
@@ -254,21 +255,31 @@ export default function SupplyManagementPage() {
       title: "Invoice Number",
       dataIndex: "invoiceNumber",
       key: "invoiceNumber",
+      width: 200,
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      width: 700,
     },
     {
       title: "Qty",
       dataIndex: "quantity",
       key: "quantity",
+      width: 50,
     },
     {
       title: "Price",
       dataIndex: "price",
       key: "price",
+      render: (_, record) => {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(record.price);
+      },
+      width: 100,
     },
     {
       title: "Total",
@@ -280,14 +291,16 @@ export default function SupplyManagementPage() {
           currency: "USD",
         }).format(total);
       },
+      width: 100,
     },
     {
-      title: "Payment Type",
+      title: "Payment",
       dataIndex: "paymentType",
       key: "paymentType",
       render: (type: string) => (
         <Tag color={type === "CASH" ? "green" : "blue"}>{type}</Tag>
       ),
+      width: 100,
     },
     {
       title: "Actions",
@@ -316,6 +329,7 @@ export default function SupplyManagementPage() {
           </Popconfirm>
         </Space>
       ),
+      width: 100,
     },
   ];
 
