@@ -12,6 +12,7 @@ export default function DashboardPage() {
     suppliesTotal: 0,
     expensesTotal: 0,
   });
+  const [profitLoss, setProfitLoss] = useState(0);
 
   const fetchSummary = async () => {
     try {
@@ -24,6 +25,9 @@ export default function DashboardPage() {
       }
       const data = await response.json();
       setSummary(data);
+      const profitLoss =
+        data.carServicesTotal - (data.suppliesTotal + data.expensesTotal);
+      setProfitLoss(profitLoss);
     } catch (error) {
       console.error("Error fetching summary:", error);
       message.error("Failed to fetch summary");
@@ -44,7 +48,7 @@ export default function DashboardPage() {
         className="mb-4"
       />
       <Row gutter={16} className="mt-4">
-        <Col span={8}>
+        <Col span={6}>
           <Card>
             <Statistic
               title="Car Services Total"
@@ -53,7 +57,7 @@ export default function DashboardPage() {
             />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Card>
             <Statistic
               title="Supplies Total"
@@ -62,12 +66,22 @@ export default function DashboardPage() {
             />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Card>
             <Statistic
               title="Expenses Total"
               value={summary.expensesTotal}
               prefix="$"
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Profit & Loss"
+              value={profitLoss}
+              prefix="$"
+              valueStyle={{ color: profitLoss > 0 ? "green" : "red" }}
             />
           </Card>
         </Col>

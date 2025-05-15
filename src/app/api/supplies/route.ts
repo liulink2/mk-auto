@@ -5,22 +5,13 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
+    console.log("searchParams", searchParams);
     const month = searchParams.get("month");
     const year = searchParams.get("year");
 
     const supplies = await prisma.supply.findMany({
       where: {
         AND: [
-          startDate && endDate
-            ? {
-                suppliedDate: {
-                  gte: new Date(startDate),
-                  lte: new Date(endDate),
-                },
-              }
-            : {},
           month && year
             ? {
                 month: parseInt(month),
