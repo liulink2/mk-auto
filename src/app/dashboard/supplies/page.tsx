@@ -16,6 +16,7 @@ import {
   Popconfirm,
   message,
   Divider,
+  Typography,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -26,6 +27,8 @@ import {
   DeleteOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
+
+const { Text } = Typography;
 
 interface SupplyItem {
   name: string;
@@ -186,6 +189,20 @@ export default function SupplyManagementPage() {
     }
   };
 
+  const handleValuesChange = (changedValues: any, allValues: any) => {
+    if (allValues.items) {
+      let totalAmount = 0;
+      allValues.items.forEach((item: any) => {
+        item.amount = item.quantity * item.price;
+        totalAmount += item.amount;
+      });
+      addForm.setFieldsValue({
+        totalAmount,
+        items: allValues.items,
+      });
+    }
+  };
+
   const handleEditSubmit = async (values: any) => {
     if (!editingSupply) return;
     try {
@@ -317,16 +334,40 @@ export default function SupplyManagementPage() {
           </Button>
         </Space>
       </div>
+
+      <Card className="mb-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Text type="secondary">Total Quantity</Text>
+            <div className="text-2xl font-bold">
+              {supplies.reduce((sum, supply) => sum + supply.quantity, 0)}
+            </div>
+          </div>
+          <div>
+            <Text type="secondary">Total Amount</Text>
+            <div className="text-2xl font-bold">
+              {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(
+                supplies.reduce(
+                  (sum, supply) => sum + supply.quantity * supply.price,
+                  0
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Divider />
+
       <Table
         columns={columns}
         dataSource={supplies}
         loading={loading}
         rowKey="id"
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} items`,
-        }}
+        pagination={false}
       />
 
       <Modal
@@ -334,12 +375,13 @@ export default function SupplyManagementPage() {
         open={isAddModalVisible}
         onCancel={handleAddCancel}
         footer={null}
-        width={1000}
+        width={1200}
       >
         <Form
           form={addForm}
           layout="vertical"
           onFinish={handleSubmit}
+          onValuesChange={handleValuesChange}
           initialValues={{
             paymentType: "CASH",
             items: [{ name: "", description: "", quantity: 1, price: 0 }],
@@ -401,7 +443,7 @@ export default function SupplyManagementPage() {
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name, ...restField }) => (
-                  <div key={key} className="flex items-center gap-3 mb-2">
+                  <div key={key} className="grid grid-cols-12 gap-4 mb-1">
                     <Form.Item
                       {...restField}
                       name={[name, "name"]}
@@ -409,7 +451,7 @@ export default function SupplyManagementPage() {
                       rules={[
                         { required: true, message: "Please enter item name" },
                       ]}
-                      className="flex-1 mb-0"
+                      className="col-span-7"
                     >
                       <Input />
                     </Form.Item>
@@ -420,6 +462,7 @@ export default function SupplyManagementPage() {
                       rules={[
                         { required: true, message: "Please input quantity!" },
                       ]}
+                      className="col-span-1"
                     >
                       <InputNumber
                         min={1}
@@ -436,17 +479,27 @@ export default function SupplyManagementPage() {
                       rules={[
                         { required: true, message: "Please input price!" },
                       ]}
+                      className="col-span-1"
                     >
                       <InputNumber
                         min={0}
                         step={0.01}
                         style={{ width: "100%" }}
-                        formatter={(value) =>
-                          `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        }
-                        parser={(value: string | undefined) =>
-                          value ? Number(value.replace(/\$\s?|(,*)/g, "")) : 0
-                        }
+                        prefix="$"
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "amount"]}
+                      label="Amount"
+                      className="col-span-2"
+                    >
+                      <InputNumber
+                        min={0}
+                        step={0.01}
+                        style={{ width: "100%" }}
+                        disabled
+                        prefix="$"
                       />
                     </Form.Item>
                     {fields.length > 1 && (
@@ -455,7 +508,7 @@ export default function SupplyManagementPage() {
                         danger
                         icon={<MinusCircleOutlined />}
                         onClick={() => remove(name)}
-                        className="mt-3"
+                        className="mt-8 col-span-1"
                       />
                     )}
                   </div>
@@ -474,9 +527,21 @@ export default function SupplyManagementPage() {
             )}
           </Form.List>
 
-          <Form.Item name="remarks" label="Remarks">
-            <Input.TextArea />
-          </Form.Item>
+          <div className="flex justify-end mb-4">
+            <div className="text-right text-xl">
+              Total Amount:
+              <div className="text-xl font-bold">
+                <Form.Item name="totalAmount" className="text-xl font-bold">
+                  <InputNumber
+                    style={{ width: "100%" }}
+                    disabled
+                    prefix="$"
+                    size="large"
+                  />
+                </Form.Item>
+              </div>
+            </div>
+          </div>
 
           <Form.Item>
             <Space>
