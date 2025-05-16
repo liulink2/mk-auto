@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Supply } from "@prisma/client";
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
     const invoiceNumber = supplies[0]?.invoiceNumber;
     if (
       !invoiceNumber ||
-      !supplies.every((s: any) => s.invoiceNumber === invoiceNumber)
+      !supplies.every((s: Supply) => s.invoiceNumber === invoiceNumber)
     ) {
       return NextResponse.json(
         { error: "All supplies must have the same invoice number" },
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
 
     // Create all supplies in a transaction
     const createdSupplies = await prisma.$transaction(
-      supplies.map((supply: any) =>
+      supplies.map((supply: Supply) =>
         prisma.supply.create({
           data: {
             invoiceNumber: supply.invoiceNumber,
@@ -42,8 +43,7 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json(createdSupplies);
-  } catch (error) {
-    console.error("Failed to create supplies:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to create supplies" },
       { status: 500 }

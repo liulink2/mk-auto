@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/auth/authOptions";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { supplierId: string } }
-) {
+type Params = Promise<{ supplierId: string }>;
+
+export async function GET(request: Request, { params }: { params: Params }) {
   try {
+    const { supplierId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -16,7 +16,7 @@ export async function GET(
 
     const supplier = await prisma.supplier.findUnique({
       where: {
-        id: params.supplierId,
+        id: supplierId,
       },
       include: {
         parent: true,
@@ -38,11 +38,9 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: { supplierId: string } }
-) {
+export async function PATCH(request: Request, { params }: { params: Params }) {
   try {
+    const { supplierId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -54,7 +52,7 @@ export async function PATCH(
 
     const supplier = await prisma.supplier.update({
       where: {
-        id: params.supplierId,
+        id: supplierId,
       },
       data: {
         name,
@@ -76,11 +74,9 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { supplierId: string } }
-) {
+export async function DELETE(request: Request, { params }: { params: Params }) {
   try {
+    const { supplierId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -90,7 +86,7 @@ export async function DELETE(
     // Check if supplier has children
     const supplier = await prisma.supplier.findUnique({
       where: {
-        id: params.supplierId,
+        id: supplierId,
       },
       include: {
         children: true,
@@ -110,7 +106,7 @@ export async function DELETE(
 
     await prisma.supplier.delete({
       where: {
-        id: params.supplierId,
+        id: supplierId,
       },
     });
 

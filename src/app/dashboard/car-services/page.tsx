@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Table,
   Button,
@@ -24,8 +24,9 @@ import {
   MinusCircleOutlined,
   CheckOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
+import { Supply } from "@prisma/client";
 
 interface CarServiceItem {
   id: string;
@@ -62,20 +63,22 @@ export default function CarServicesPage() {
   const [selectedMonthYear, setSelectedMonthYear] = useState(dayjs());
   const [supplyNames, setSupplyNames] = useState<string[]>([]);
 
-  const fetchCarServices = async () => {
-    try {
-      const month = selectedMonthYear.month() + 1;
-      const year = selectedMonthYear.year();
-      const response = await fetch(
-        `/api/car-services?month=${month}&year=${year}`
-      );
-      const data = await response.json();
-      setCarServices(data);
-    } catch (error) {
-      console.error("Error fetching car services:", error);
-      message.error("Failed to fetch car services");
-    }
-  };
+  const fetchCarServices = useCallback(
+    async (selectedDate: Dayjs) => {
+      try {
+        const month = selectedDate.month() + 1;
+        const year = selectedDate.year();
+        const response = await fetch(
+          `/api/car-services?month=${month}&year=${year}`
+        );
+        const data = await response.json();
+        setCarServices(data);
+      } catch {
+        message.error("Failed to fetch car services");
+      }
+    },
+    [setCarServices]
+  );
 
   // Debounce the supply name fetching
   const debouncedFetchSupplyNames = debounce(async (searchText: string) => {
@@ -86,7 +89,7 @@ export default function CarServicesPage() {
         throw new Error("Failed to fetch supply names");
       }
       const data = await response.json();
-      setSupplyNames(data.map((supply: any) => supply.name));
+      setSupplyNames(data.map((supply: Supply) => supply.name));
     } catch (error) {
       console.error("Failed to fetch supply names:", error);
       message.error("Failed to fetch supply names");
@@ -94,8 +97,8 @@ export default function CarServicesPage() {
   }, 300);
 
   useEffect(() => {
-    fetchCarServices();
-  }, [selectedMonthYear]);
+    fetchCarServices(selectedMonthYear);
+  }, [selectedMonthYear, fetchCarServices]);
 
   const handleAdd = () => {
     setEditingCarService(null);
@@ -136,9 +139,8 @@ export default function CarServicesPage() {
         method: "DELETE",
       });
       message.success("Car service deleted successfully");
-      fetchCarServices();
-    } catch (error) {
-      console.error("Error deleting car service:", error);
+      fetchCarServices(selectedMonthYear);
+    } catch {
       message.error("Failed to delete car service");
     }
   };
@@ -176,18 +178,20 @@ export default function CarServicesPage() {
       }
 
       setIsModalVisible(false);
-      fetchCarServices();
-    } catch (error) {
-      console.error("Error submitting car service:", error);
+      fetchCarServices(selectedMonthYear);
+    } catch {
       message.error("Failed to submit car service");
     }
   };
 
-  const handleValuesChange = (changedValues: any, allValues: any) => {
+  const handleValuesChange = (
+    _: Partial<CarService>,
+    allValues: CarService
+  ) => {
     if (!allValues.carServiceItems) return;
 
     let totalAmount = 0;
-    allValues.carServiceItems.forEach((item: any) => {
+    allValues.carServiceItems.forEach((item: CarServiceItem) => {
       item.totalAmount = item.price ?? 0 * item.quantity ?? 0;
       totalAmount += item.totalAmount;
     });
@@ -250,7 +254,7 @@ export default function CarServicesPage() {
     {
       title: "Status",
       key: "status",
-      render: (_: any, record: CarService) => {
+      render: (_: string, record: CarService) => {
         return (
           <>
             {!record.carOutDateTime ? (
@@ -267,7 +271,7 @@ export default function CarServicesPage() {
     {
       title: "Actions",
       key: "actions",
-      render: (_: any, record: CarService) => (
+      render: (_: string, record: CarService) => (
         <Space>
           <Button
             type="text"
@@ -363,7 +367,7 @@ export default function CarServicesPage() {
         onCancel={() => setIsModalVisible(false)}
         width={1200}
       >
-        <Form
+        <Form<CarService>
           form={form}
           onValuesChange={handleValuesChange}
           layout="vertical"

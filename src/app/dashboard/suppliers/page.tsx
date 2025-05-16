@@ -91,7 +91,7 @@ export default function SuppliersPage() {
         `Supplier ${currentStatus ? "disabled" : "enabled"} successfully`
       );
       fetchSuppliers();
-    } catch (error) {
+    } catch {
       message.error("Failed to update supplier status");
     }
   };
@@ -109,10 +109,8 @@ export default function SuppliersPage() {
 
       message.success("Supplier deleted successfully");
       fetchSuppliers();
-    } catch (error) {
-      message.error(
-        error instanceof Error ? error.message : "Failed to delete supplier"
-      );
+    } catch {
+      message.error("Failed to delete supplier");
     }
   };
 
@@ -152,7 +150,7 @@ export default function SuppliersPage() {
       );
       handleCancel();
       fetchSuppliers();
-    } catch (error) {
+    } catch {
       message.error("Failed to save supplier");
     }
   };

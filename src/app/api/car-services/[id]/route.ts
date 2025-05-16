@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { CarServiceItem } from "@prisma/client";
 
+type Params = Promise<{ id: string }>;
+
+// PUT /api/car-services/:id
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Params }
 ) {
+  const { id } = await params;
   try {
     const body = await request.json();
     const carInDateTime = new Date(body.carInDateTime);
 
     // Update the CarService
     const carService = await prisma.carService.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         carPlate: body.carPlate,
         carDetails: body.carDetails,
@@ -33,14 +38,16 @@ export async function PUT(
     if (body.carServiceItems && body.carServiceItems.length > 0) {
       // Delete existing items
       await prisma.carServiceItem.deleteMany({
-        where: { carServiceId: params.id },
+        where: { carServiceId: id },
       });
 
       // Create new items
-      const carServiceItemsData = body.carServiceItems.map((item: any) => ({
-        ...item,
-        carServiceId: params.id,
-      }));
+      const carServiceItemsData = body.carServiceItems.map(
+        (item: CarServiceItem) => ({
+          ...item,
+          carServiceId: id,
+        })
+      );
 
       await prisma.carServiceItem.createMany({
         data: carServiceItemsData,
@@ -59,11 +66,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Params }
 ) {
+  const { id } = await params;
   try {
     await prisma.carService.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

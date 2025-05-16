@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "../../../auth/[...nextauth]/route";
+import { authOptions } from "@/auth/authOptions";
 
-export async function POST(
-  request: Request,
-  { params }: { params: { supplierId: string } }
-) {
+type Params = Promise<{ supplierId: string }>;
+
+export async function POST(request: Request, { params }: { params: Params }) {
   try {
+    const { supplierId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -18,7 +18,7 @@ export async function POST(
 
     const supplier = await prisma.supplier.update({
       where: {
-        id: params.supplierId,
+        id: supplierId,
       },
       data: {
         isActive,

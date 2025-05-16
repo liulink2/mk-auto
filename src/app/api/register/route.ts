@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: "Error creating user" },
       { status: 500 }

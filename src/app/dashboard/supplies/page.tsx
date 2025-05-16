@@ -17,7 +17,6 @@ import {
   message,
   Divider,
   Typography,
-  Collapse,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -36,6 +35,7 @@ interface SupplyItem {
   description?: string;
   quantity: number;
   price: number;
+  amount: number;
 }
 
 interface Supplier {
@@ -83,15 +83,15 @@ export default function SupplyManagementPage() {
   const [editForm] = Form.useForm();
 
   useEffect(() => {
-    fetchSupplies();
+    fetchSupplies(date);
     fetchSuppliers();
   }, [date]);
 
-  const fetchSupplies = async () => {
+  const fetchSupplies = async (selectedDate: Dayjs) => {
     try {
       setLoading(true);
-      const month = date.month() + 1; // dayjs months are 0-based
-      const year = date.year();
+      const month = selectedDate.month() + 1; // dayjs months are 0-based
+      const year = selectedDate.year();
 
       const response = await fetch(`/api/supplies?month=${month}&year=${year}`);
       if (!response.ok) {
@@ -99,8 +99,7 @@ export default function SupplyManagementPage() {
       }
       const data = await response.json();
       setSupplies(data);
-    } catch (error) {
-      console.error("Failed to fetch supplies:", error);
+    } catch {
       message.error("Failed to fetch supplies");
     } finally {
       setLoading(false);
@@ -115,8 +114,7 @@ export default function SupplyManagementPage() {
       }
       const data = await response.json();
       setSuppliers(data);
-    } catch (error) {
-      console.error("Failed to fetch suppliers:", error);
+    } catch {
       message.error("Failed to fetch suppliers");
     }
   };
@@ -182,17 +180,19 @@ export default function SupplyManagementPage() {
       message.success("Supplies created successfully");
       setIsAddModalVisible(false);
       addForm.resetFields();
-      fetchSupplies();
-    } catch (error) {
-      console.error("Error creating supplies:", error);
+      fetchSupplies(date);
+    } catch {
       message.error("Failed to create supplies");
     }
   };
 
-  const handleValuesChange = (changedValues: any, allValues: any) => {
+  const handleValuesChange = (
+    _: Partial<SupplyFormValues>,
+    allValues: SupplyFormValues
+  ) => {
     if (allValues.items) {
       let totalAmount = 0;
-      allValues.items.forEach((item: any) => {
+      allValues.items.forEach((item: SupplyItem) => {
         item.amount = item.quantity * item.price;
         totalAmount += item.amount;
       });
@@ -203,7 +203,7 @@ export default function SupplyManagementPage() {
     }
   };
 
-  const handleEditSubmit = async (values: any) => {
+  const handleEditSubmit = async (values: SupplyFormValues) => {
     if (!editingSupply) return;
     try {
       const response = await fetch(`/api/supplies/${editingSupply.id}`, {
@@ -217,8 +217,8 @@ export default function SupplyManagementPage() {
       if (!response.ok) throw new Error("Failed to update supply");
       message.success("Supply updated successfully");
       setIsEditModalVisible(false);
-      fetchSupplies();
-    } catch (error) {
+      fetchSupplies(date);
+    } catch {
       message.error("Failed to update supply");
     }
   };
@@ -232,8 +232,8 @@ export default function SupplyManagementPage() {
       if (!response.ok) throw new Error("Failed to delete supply");
 
       message.success("Supply deleted successfully");
-      fetchSupplies();
-    } catch (error) {
+      fetchSupplies(date);
+    } catch {
       message.error("Failed to delete supply");
     }
   };
@@ -394,7 +394,7 @@ export default function SupplyManagementPage() {
         footer={null}
         width={1200}
       >
-        <Form
+        <Form<SupplyFormValues>
           form={addForm}
           layout="vertical"
           onFinish={handleSubmit}

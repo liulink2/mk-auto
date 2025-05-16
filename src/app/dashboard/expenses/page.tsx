@@ -56,14 +56,14 @@ export default function ExpenseManagementPage() {
   const [editForm] = Form.useForm();
 
   useEffect(() => {
-    fetchExpenses();
+    fetchExpenses(date);
   }, [date]);
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = async (selectedDate: Dayjs) => {
     try {
       setLoading(true);
-      const month = date.month() + 1; // dayjs months are 0-based
-      const year = date.year();
+      const month = selectedDate.month() + 1; // dayjs months are 0-based
+      const year = selectedDate.year();
 
       const response = await fetch(`/api/expenses?month=${month}&year=${year}`);
       if (!response.ok) {
@@ -127,14 +127,13 @@ export default function ExpenseManagementPage() {
       message.success("Expense created successfully");
       setIsAddModalVisible(false);
       addForm.resetFields();
-      fetchExpenses();
-    } catch (error) {
-      console.error("Error creating expense:", error);
+      fetchExpenses(date);
+    } catch {
       message.error("Failed to create expense");
     }
   };
 
-  const handleEditSubmit = async (values: any) => {
+  const handleEditSubmit = async (values: ExpenseFormValues) => {
     if (!editingExpense) return;
     try {
       const response = await fetch(`/api/expenses/${editingExpense.id}`, {
@@ -148,8 +147,8 @@ export default function ExpenseManagementPage() {
       if (!response.ok) throw new Error("Failed to update expense");
       message.success("Expense updated successfully");
       setIsEditModalVisible(false);
-      fetchExpenses();
-    } catch (error) {
+      fetchExpenses(date);
+    } catch {
       message.error("Failed to update expense");
     }
   };
@@ -163,8 +162,8 @@ export default function ExpenseManagementPage() {
       if (!response.ok) throw new Error("Failed to delete expense");
 
       message.success("Expense deleted successfully");
-      fetchExpenses();
-    } catch (error) {
+      fetchExpenses(date);
+    } catch {
       message.error("Failed to delete expense");
     }
   };

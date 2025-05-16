@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/auth/authOptions";
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { userId: string } }
-) {
+type Params = Promise<{ userId: string }>;
+
+export async function DELETE(request: Request, { params }: { params: Params }) {
   try {
+    const { userId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "ADMIN") {
@@ -16,7 +16,7 @@ export async function DELETE(
 
     // Check if user exists and get their role
     const targetUser = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
       select: { role: true },
     });
 
@@ -30,7 +30,7 @@ export async function DELETE(
     }
 
     // Prevent deleting yourself
-    if (params.userId === session.user.id) {
+    if (userId === session.user.id) {
       return new NextResponse("Cannot delete your own account", {
         status: 400,
       });
@@ -38,12 +38,12 @@ export async function DELETE(
 
     await prisma.user.delete({
       where: {
-        id: params.userId,
+        id: userId,
       },
     });
 
     return new NextResponse(null, { status: 204 });
-  } catch (error) {
+  } catch {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

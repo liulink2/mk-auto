@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+type Params = Promise<{ id: string }>;
+
+export async function PUT(request: Request, { params }: { params: Params }) {
   try {
     const data = await request.json();
+    const { id } = await params;
     const updatedSupply = await prisma.supply.update({
       where: {
-        id: params.id,
+        id,
       },
       data: {
         invoiceNumber: data.invoiceNumber,
@@ -30,8 +30,7 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedSupply);
-  } catch (error) {
-    console.error("Failed to update supply:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to update supply" },
       { status: 500 }
@@ -42,7 +41,7 @@ export async function PUT(
 // DELETE /api/supplies/:id
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Params }
 ) {
   try {
     const { id } = await params;
@@ -50,7 +49,7 @@ export async function DELETE(
       where: { id },
     });
     return NextResponse.json({ message: "Supply deleted successfully" });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete supply" },
       { status: 500 }

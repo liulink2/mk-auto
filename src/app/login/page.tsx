@@ -29,7 +29,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
       router.refresh();
-    } catch (error) {
+    } catch {
       messageApi.error("An error occurred during login");
     } finally {
       setLoading(false);
@@ -70,7 +70,7 @@ export default function LoginPage() {
           </Form.Item>
 
           <div className="text-center">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               className="text-blue-600 hover:text-blue-800"

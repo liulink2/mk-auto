@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       },
     });
     return NextResponse.json(expenses);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch expenses" },
       { status: 500 }
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       },
     });
     return NextResponse.json(expense);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to create expense" },
       { status: 500 }

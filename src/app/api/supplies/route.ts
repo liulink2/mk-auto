@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+type Params = Promise<{ id: string }>;
+
 // GET /api/supplies
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
       },
     });
     return NextResponse.json(supplies);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch supplies" },
       { status: 500 }
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest) {
       data: body,
     });
     return NextResponse.json(supply);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to create supply" },
       { status: 500 }
@@ -59,36 +61,19 @@ export async function POST(request: NextRequest) {
 // PUT /api/supplies/:id
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Params }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const supply = await prisma.supply.update({
-      where: { id: params.id },
+      where: { id },
       data: body,
     });
     return NextResponse.json(supply);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to update supply" },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE /api/supplies/:id
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    await prisma.supply.delete({
-      where: { id: params.id },
-    });
-    return NextResponse.json({ message: "Supply deleted successfully" });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete supply" },
       { status: 500 }
     );
   }

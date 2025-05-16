@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "../../../auth/[...nextauth]/route";
+import { authOptions } from "@/auth/authOptions";
 
-export async function POST(
-  request: Request,
-  { params }: { params: { userId: string } }
-) {
+type Params = Promise<{ userId: string }>;
+
+export async function POST(request: Request, { params }: { params: Params }) {
   try {
+    const { userId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "ADMIN") {
@@ -16,7 +16,7 @@ export async function POST(
 
     // Check if user exists and get their role
     const targetUser = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
       select: { role: true },
     });
 
@@ -33,7 +33,7 @@ export async function POST(
 
     const user = await prisma.user.update({
       where: {
-        id: params.userId,
+        id: userId,
       },
       data: {
         isActive,
@@ -41,7 +41,7 @@ export async function POST(
     });
 
     return NextResponse.json(user);
-  } catch (error) {
+  } catch {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

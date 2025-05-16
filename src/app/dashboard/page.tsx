@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, Row, Col, Statistic, DatePicker, message } from "antd";
-import { UserOutlined, CarOutlined, DollarOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 export default function DashboardPage() {
   const [selectedMonthYear, setSelectedMonthYear] = useState(dayjs());
@@ -14,10 +13,10 @@ export default function DashboardPage() {
   });
   const [profitLoss, setProfitLoss] = useState(0);
 
-  const fetchSummary = async () => {
+  const fetchSummary = async (selectedDate: Dayjs) => {
     try {
-      const month = selectedMonthYear.month() + 1;
-      const year = selectedMonthYear.year();
+      const month = selectedDate.month() + 1;
+      const year = selectedDate.year();
 
       const response = await fetch(`/api/summary?month=${month}&year=${year}`);
       if (!response.ok) {
@@ -35,7 +34,7 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchSummary();
+    fetchSummary(selectedMonthYear);
   }, [selectedMonthYear]);
 
   return (

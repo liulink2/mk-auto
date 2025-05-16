@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  UserOutlined,
   DeleteOutlined,
   LockOutlined,
   UnlockOutlined,
@@ -70,7 +69,7 @@ export default function UsersPage() {
         `User ${currentStatus ? "disabled" : "enabled"} successfully`
       );
       fetchUsers();
-    } catch (error) {
+    } catch {
       message.error("Failed to update user status");
     }
   };
@@ -85,7 +84,7 @@ export default function UsersPage() {
 
       message.success("User deleted successfully");
       fetchUsers();
-    } catch (error) {
+    } catch {
       message.error("Failed to delete user");
     }
   };
@@ -114,7 +113,7 @@ export default function UsersPage() {
     {
       title: "Actions",
       key: "actions",
-      render: (_: any, record: User) => {
+      render: (_: string, record: User) => {
         const isAdmin = record.role === "ADMIN";
         return (
           <Space>

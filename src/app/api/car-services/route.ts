@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { CarServiceItem } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
@@ -59,10 +60,12 @@ export async function POST(request: NextRequest) {
 
     // Create CarServiceItems
     if (body.carServiceItems && body.carServiceItems.length > 0) {
-      const carServiceItemsData = body.carServiceItems.map((item: any) => ({
-        ...item,
-        carServiceId: carService.id,
-      }));
+      const carServiceItemsData = body.carServiceItems.map(
+        (item: CarServiceItem) => ({
+          ...item,
+          carServiceId: carService.id,
+        })
+      );
 
       await prisma.carServiceItem.createMany({
         data: carServiceItemsData,
