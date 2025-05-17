@@ -40,10 +40,6 @@ export default function SuppliersPage() {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (session?.user?.role !== "ADMIN") {
-      router.push("/dashboard");
-      return;
-    }
     fetchSuppliers();
   }, [session, router]);
 
