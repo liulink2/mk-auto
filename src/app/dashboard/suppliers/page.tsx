@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -44,7 +44,7 @@ export default function SuppliersPage() {
     fetchSuppliers();
   }, [session, router]);
 
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch("/api/suppliers");
@@ -64,7 +64,7 @@ export default function SuppliersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message]);
 
   const handleToggleStatus = async (
     supplierId: string,

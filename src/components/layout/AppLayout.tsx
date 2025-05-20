@@ -4,7 +4,6 @@ import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
-  SettingOutlined,
   LogoutOutlined,
   ShopOutlined,
   ShoppingCartOutlined,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   DatePicker,
@@ -83,31 +83,31 @@ export default function SupplyManagementPage() {
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  useEffect(() => {
-    fetchSupplies(date);
-    fetchSuppliers();
-  }, [date]);
+  const fetchSupplies = useCallback(
+    async (selectedDate: Dayjs) => {
+      try {
+        setLoading(true);
+        const month = selectedDate.month() + 1; // dayjs months are 0-based
+        const year = selectedDate.year();
 
-  const fetchSupplies = async (selectedDate: Dayjs) => {
-    try {
-      setLoading(true);
-      const month = selectedDate.month() + 1; // dayjs months are 0-based
-      const year = selectedDate.year();
-
-      const response = await fetch(`/api/supplies?month=${month}&year=${year}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch supplies");
+        const response = await fetch(
+          `/api/supplies?month=${month}&year=${year}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch supplies");
+        }
+        const data = await response.json();
+        setSupplies(data);
+      } catch {
+        message.error("Failed to fetch supplies");
+      } finally {
+        setLoading(false);
       }
-      const data = await response.json();
-      setSupplies(data);
-    } catch {
-      message.error("Failed to fetch supplies");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [message]
+  );
 
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     try {
       const response = await fetch("/api/suppliers");
       if (!response.ok) {
@@ -118,7 +118,12 @@ export default function SupplyManagementPage() {
     } catch {
       message.error("Failed to fetch suppliers");
     }
-  };
+  }, [message]);
+
+  useEffect(() => {
+    fetchSupplies(date);
+    fetchSuppliers();
+  }, [date, fetchSuppliers, fetchSupplies]);
 
   const showAddModal = () => {
     addForm.setFieldsValue({

@@ -1,9 +1,9 @@
 "use client";
 
-import { Table, Button, Space, Popconfirm, App, message } from "antd";
+import { Table, Button, Space, Popconfirm, App } from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DeleteOutlined,
   LockOutlined,
@@ -25,19 +25,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const hasRedirectedRef = useRef(false);
 
-  useEffect(() => {
-    if (!hasRedirectedRef.current) {
-      if (session?.user?.role !== "ADMIN") {
-        hasRedirectedRef.current = true;
-        message.error("You are not authorized to access this page");
-        router.push("/dashboard");
-        return;
-      }
-      fetchUsers();
-    }
-  }, [session, router, message]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch("/api/users");
@@ -57,7 +45,19 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message]);
+
+  useEffect(() => {
+    if (!hasRedirectedRef.current) {
+      if (session?.user?.role !== "ADMIN") {
+        hasRedirectedRef.current = true;
+        message.error("You are not authorized to access this page");
+        router.push("/dashboard");
+        return;
+      }
+      fetchUsers();
+    }
+  }, [session, router, message, fetchUsers]);
 
   const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
     try {

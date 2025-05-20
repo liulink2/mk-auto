@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   DatePicker,
@@ -17,6 +17,7 @@ import {
   Typography,
   Divider,
   App,
+  FormInstance,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -44,6 +45,92 @@ interface ExpenseFormValues {
   description?: string;
 }
 
+interface ExpenseFormProps {
+  form: FormInstance<ExpenseFormValues>;
+  onFinish: (values: ExpenseFormValues) => void;
+  onCancel: () => void;
+  initialValues?: Partial<ExpenseFormValues>;
+  submitText?: string;
+}
+
+const ExpenseForm: React.FC<ExpenseFormProps> = ({
+  form,
+  onFinish,
+  onCancel,
+  initialValues,
+  submitText = "Create",
+}) => {
+  return (
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={onFinish}
+      initialValues={initialValues}
+    >
+      <div className="grid grid-cols-12 gap-4">
+        <Form.Item
+          name="issuedDate"
+          label="Date"
+          rules={[{ required: true, message: "Please select a date" }]}
+          className="col-span-4"
+        >
+          <DatePicker style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item
+          name="name"
+          label="Name"
+          rules={[{ required: true, message: "Please enter expense name" }]}
+          className="col-span-8"
+        >
+          <Input />
+        </Form.Item>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4">
+        <Form.Item
+          name="amount"
+          label="Amount"
+          rules={[{ required: true, message: "Please enter amount" }]}
+          className="col-span-6"
+        >
+          <InputNumber
+            min={0}
+            step={0.01}
+            style={{ width: "100%" }}
+            prefix="$"
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="paymentType"
+          label="Payment"
+          rules={[{ required: true, message: "Please select payment type" }]}
+          className="col-span-6"
+        >
+          <Select>
+            <Select.Option value="CASH">Cash</Select.Option>
+            <Select.Option value="CARD">Card</Select.Option>
+          </Select>
+        </Form.Item>
+      </div>
+
+      <Form.Item name="description" label="Description">
+        <Input.TextArea />
+      </Form.Item>
+
+      <Form.Item>
+        <Space>
+          <Button type="primary" htmlType="submit">
+            {submitText}
+          </Button>
+          <Button onClick={onCancel}>Cancel</Button>
+        </Space>
+      </Form.Item>
+    </Form>
+  );
+};
+
 export default function ExpenseManagementPage() {
   const { message } = App.useApp();
   const [date, setDate] = useState(dayjs());
@@ -56,29 +143,34 @@ export default function ExpenseManagementPage() {
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
+  const fetchExpenses = useCallback(
+    async (selectedDate: Dayjs) => {
+      try {
+        setLoading(true);
+        const month = selectedDate.month() + 1; // dayjs months are 0-based
+        const year = selectedDate.year();
+
+        const response = await fetch(
+          `/api/expenses?month=${month}&year=${year}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch expenses");
+        }
+        const data = await response.json();
+        setExpenses(data);
+      } catch (error) {
+        console.error("Failed to fetch expenses:", error);
+        message.error("Failed to fetch expenses");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [message]
+  );
+
   useEffect(() => {
     fetchExpenses(date);
-  }, [date]);
-
-  const fetchExpenses = async (selectedDate: Dayjs) => {
-    try {
-      setLoading(true);
-      const month = selectedDate.month() + 1; // dayjs months are 0-based
-      const year = selectedDate.year();
-
-      const response = await fetch(`/api/expenses?month=${month}&year=${year}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch expenses");
-      }
-      const data = await response.json();
-      setExpenses(data);
-    } catch (error) {
-      console.error("Failed to fetch expenses:", error);
-      message.error("Failed to fetch expenses");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [date, fetchExpenses]);
 
   const showAddModal = () => {
     addForm.setFieldsValue({
@@ -293,72 +385,12 @@ export default function ExpenseManagementPage() {
         footer={null}
         width={800}
       >
-        <Form
+        <ExpenseForm
           form={addForm}
-          layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{
-            paymentType: "CASH",
-          }}
-        >
-          <div className="grid grid-cols-12 gap-4">
-            <Form.Item
-              name="issuedDate"
-              label="Date"
-              rules={[{ required: true, message: "Please select a date" }]}
-              className="col-span-4"
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: "Please enter expense name" }]}
-              className="col-span-8"
-            >
-              <Input />
-            </Form.Item>
-          </div>
-
-          <div className="grid grid-cols-12 gap-4">
-            <Form.Item
-              name="amount"
-              label="Amount"
-              rules={[{ required: true, message: "Please enter amount" }]}
-              className="col-span-6"
-            >
-              <InputNumber style={{ width: "100%" }} prefix="$" />
-            </Form.Item>
-
-            <Form.Item
-              name="paymentType"
-              label="Payment"
-              rules={[
-                { required: true, message: "Please select payment type" },
-              ]}
-              className="col-span-6"
-            >
-              <Select>
-                <Select.Option value="CASH">Cash</Select.Option>
-                <Select.Option value="CARD">Card</Select.Option>
-              </Select>
-            </Form.Item>
-          </div>
-
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item>
-
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-              <Button onClick={handleAddCancel}>Cancel</Button>
-            </Space>
-          </Form.Item>
-        </Form>
+          onCancel={handleAddCancel}
+          initialValues={{ paymentType: "CASH" }}
+        />
       </Modal>
 
       <Modal
@@ -368,70 +400,12 @@ export default function ExpenseManagementPage() {
         footer={null}
         width={800}
       >
-        <Form form={editForm} layout="vertical" onFinish={handleEditSubmit}>
-          <div className="grid grid-cols-12 gap-4">
-            <Form.Item
-              name="issuedDate"
-              label="Date"
-              rules={[{ required: true, message: "Please select a date" }]}
-              className="col-span-4"
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: "Please enter expense name" }]}
-              className="col-span-8"
-            >
-              <Input />
-            </Form.Item>
-          </div>
-
-          <div className="grid grid-cols-12 gap-4">
-            <Form.Item
-              name="amount"
-              label="Amount"
-              rules={[{ required: true, message: "Please enter amount" }]}
-              className="col-span-6"
-            >
-              <InputNumber
-                min={0}
-                step={0.01}
-                style={{ width: "100%" }}
-                prefix="$"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="paymentType"
-              label="Payment"
-              rules={[
-                { required: true, message: "Please select payment type" },
-              ]}
-              className="col-span-6"
-            >
-              <Select>
-                <Select.Option value="CASH">Cash</Select.Option>
-                <Select.Option value="CARD">Card</Select.Option>
-              </Select>
-            </Form.Item>
-          </div>
-
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item>
-
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Update
-              </Button>
-              <Button onClick={handleEditCancel}>Cancel</Button>
-            </Space>
-          </Form.Item>
-        </Form>
+        <ExpenseForm
+          form={editForm}
+          onFinish={handleEditSubmit}
+          onCancel={handleEditCancel}
+          submitText="Update"
+        />
       </Modal>
 
       <Modal

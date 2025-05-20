@@ -63,12 +63,14 @@ export default function CarServicesPage() {
   const [form] = Form.useForm();
   const [selectedMonthYear, setSelectedMonthYear] = useState(dayjs());
   const [supplyNames, setSupplyNames] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchCarServices = useCallback(
     async (selectedDate: Dayjs) => {
       try {
         const month = selectedDate.month() + 1;
         const year = selectedDate.year();
+        setLoading(true);
         const response = await fetch(
           `/api/car-services?month=${month}&year=${year}`
         );
@@ -76,9 +78,11 @@ export default function CarServicesPage() {
         setCarServices(data);
       } catch {
         message.error("Failed to fetch car services");
+      } finally {
+        setLoading(false);
       }
     },
-    [setCarServices]
+    [setCarServices, message]
   );
 
   // Debounce the supply name fetching
@@ -351,6 +355,7 @@ export default function CarServicesPage() {
         columns={columns}
         rowKey="id"
         pagination={false}
+        loading={loading}
       />
 
       <h2 className="text-xl font-bold mt-4">Completed Car Service</h2>
@@ -359,6 +364,7 @@ export default function CarServicesPage() {
         columns={columns}
         rowKey="id"
         pagination={false}
+        loading={loading}
       />
 
       <Modal

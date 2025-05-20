@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, Row, Col, Statistic, DatePicker, App } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -14,29 +14,34 @@ export default function DashboardPage() {
   });
   const [profitLoss, setProfitLoss] = useState(0);
 
-  const fetchSummary = async (selectedDate: Dayjs) => {
-    try {
-      const month = selectedDate.month() + 1;
-      const year = selectedDate.year();
+  const fetchSummary = useCallback(
+    async (selectedDate: Dayjs) => {
+      try {
+        const month = selectedDate.month() + 1;
+        const year = selectedDate.year();
 
-      const response = await fetch(`/api/summary?month=${month}&year=${year}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch summary");
+        const response = await fetch(
+          `/api/summary?month=${month}&year=${year}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch summary");
+        }
+        const data = await response.json();
+        setSummary(data);
+        const profitLoss =
+          data.carServicesTotal - (data.suppliesTotal + data.expensesTotal);
+        setProfitLoss(profitLoss);
+      } catch (error) {
+        console.error("Error fetching summary:", error);
+        message.error("Failed to fetch summary");
       }
-      const data = await response.json();
-      setSummary(data);
-      const profitLoss =
-        data.carServicesTotal - (data.suppliesTotal + data.expensesTotal);
-      setProfitLoss(profitLoss);
-    } catch (error) {
-      console.error("Error fetching summary:", error);
-      message.error("Failed to fetch summary");
-    }
-  };
+    },
+    [message]
+  );
 
   useEffect(() => {
     fetchSummary(selectedMonthYear);
-  }, [selectedMonthYear]);
+  }, [selectedMonthYear, fetchSummary]);
 
   return (
     <div>
