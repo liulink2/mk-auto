@@ -40,10 +40,6 @@ export default function SuppliersPage() {
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, [session, router]);
-
   const fetchSuppliers = useCallback(async () => {
     try {
       setLoading(true);
@@ -65,6 +61,10 @@ export default function SuppliersPage() {
       setLoading(false);
     }
   }, [message]);
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
 
   const handleToggleStatus = async (
     supplierId: string,

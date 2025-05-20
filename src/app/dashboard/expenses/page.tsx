@@ -190,15 +190,9 @@ export default function ExpenseManagementPage() {
     setIsModalVisible(true);
   };
 
-  const handleAddCancel = () => {
+  const handleCancel = () => {
     setIsModalVisible(false);
     expenseForm.resetFields();
-  };
-
-  const handleEditCancel = () => {
-    setIsModalVisible(false);
-    expenseForm.resetFields();
-    setEditingExpense(null);
   };
 
   const handleSubmit = async (values: ExpenseFormValues) => {
@@ -379,14 +373,14 @@ export default function ExpenseManagementPage() {
       <Modal
         title={editingExpense ? "Edit Expense" : "New Expense"}
         open={isModalVisible}
-        onCancel={handleAddCancel}
+        onCancel={handleCancel}
         footer={null}
         width={800}
       >
         <ExpenseForm
           form={expenseForm}
           onFinish={handleSubmit}
-          onCancel={handleAddCancel}
+          onCancel={handleCancel}
           initialValues={{ paymentType: "CASH" }}
         />
       </Modal>
