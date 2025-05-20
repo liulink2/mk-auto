@@ -136,12 +136,10 @@ export default function ExpenseManagementPage() {
   const [date, setDate] = useState(dayjs());
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSummaryModalVisible, setIsSummaryModalVisible] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [addForm] = Form.useForm();
-  const [editForm] = Form.useForm();
+  const [expenseForm] = Form.useForm();
 
   const fetchExpenses = useCallback(
     async (selectedDate: Dayjs) => {
@@ -173,33 +171,33 @@ export default function ExpenseManagementPage() {
   }, [date, fetchExpenses]);
 
   const showAddModal = () => {
-    addForm.setFieldsValue({
+    expenseForm.setFieldsValue({
       issuedDate: dayjs(),
       name: "",
       amount: 0,
       paymentType: "CASH",
       description: "",
     });
-    setIsAddModalVisible(true);
+    setIsModalVisible(true);
   };
 
   const showEditExpenseModal = (expense: Expense) => {
     setEditingExpense(expense);
-    editForm.setFieldsValue({
+    expenseForm.setFieldsValue({
       ...expense,
       issuedDate: dayjs(expense.issuedDate),
     });
-    setIsEditModalVisible(true);
+    setIsModalVisible(true);
   };
 
   const handleAddCancel = () => {
-    setIsAddModalVisible(false);
-    addForm.resetFields();
+    setIsModalVisible(false);
+    expenseForm.resetFields();
   };
 
   const handleEditCancel = () => {
-    setIsEditModalVisible(false);
-    editForm.resetFields();
+    setIsModalVisible(false);
+    expenseForm.resetFields();
     setEditingExpense(null);
   };
 
@@ -218,8 +216,8 @@ export default function ExpenseManagementPage() {
       }
 
       message.success("Expense created successfully");
-      setIsAddModalVisible(false);
-      addForm.resetFields();
+      setIsModalVisible(false);
+      expenseForm.resetFields();
       fetchExpenses(date);
     } catch {
       message.error("Failed to create expense");
@@ -239,7 +237,7 @@ export default function ExpenseManagementPage() {
       });
       if (!response.ok) throw new Error("Failed to update expense");
       message.success("Expense updated successfully");
-      setIsEditModalVisible(false);
+      setIsModalVisible(false);
       fetchExpenses(date);
     } catch {
       message.error("Failed to update expense");
@@ -379,32 +377,17 @@ export default function ExpenseManagementPage() {
       />
 
       <Modal
-        title="New Expense"
-        open={isAddModalVisible}
+        title={editingExpense ? "Edit Expense" : "New Expense"}
+        open={isModalVisible}
         onCancel={handleAddCancel}
         footer={null}
         width={800}
       >
         <ExpenseForm
-          form={addForm}
+          form={expenseForm}
           onFinish={handleSubmit}
           onCancel={handleAddCancel}
           initialValues={{ paymentType: "CASH" }}
-        />
-      </Modal>
-
-      <Modal
-        title="Edit Expense"
-        open={isEditModalVisible}
-        onCancel={handleEditCancel}
-        footer={null}
-        width={800}
-      >
-        <ExpenseForm
-          form={editForm}
-          onFinish={handleEditSubmit}
-          onCancel={handleEditCancel}
-          submitText="Update"
         />
       </Modal>
 
