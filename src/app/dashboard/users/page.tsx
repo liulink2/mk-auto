@@ -1,9 +1,9 @@
 "use client";
 
-import { Table, Button, Space, Popconfirm, message } from "antd";
+import { Table, Button, Space, Popconfirm, App, message } from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DeleteOutlined,
   LockOutlined,
@@ -18,18 +18,24 @@ interface User {
 }
 
 export default function UsersPage() {
+  const { message } = App.useApp();
   const { data: session } = useSession();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
-    if (session?.user?.role !== "ADMIN") {
-      router.push("/dashboard");
-      return;
+    if (!hasRedirectedRef.current) {
+      if (session?.user?.role !== "ADMIN") {
+        hasRedirectedRef.current = true;
+        message.error("You are not authorized to access this page");
+        router.push("/dashboard");
+        return;
+      }
+      fetchUsers();
     }
-    fetchUsers();
-  }, [session, router]);
+  }, [session, router, message]);
 
   const fetchUsers = async () => {
     try {

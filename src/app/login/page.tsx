@@ -1,13 +1,13 @@
 "use client";
 
-import { Form, Input, Button, Card, message } from "antd";
+import { Form, Input, Button, Card, App } from "antd";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function LoginPage() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -22,7 +22,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        messageApi.error(result.error);
+        message.error(result.error);
         form.setFieldsValue({ password: "" });
         return;
       }
@@ -30,7 +30,7 @@ export default function LoginPage() {
       router.push("/dashboard");
       router.refresh();
     } catch {
-      messageApi.error("An error occurred during login");
+      message.error("An error occurred during login");
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      {contextHolder}
       <Card title="Login" className="w-full max-w-md">
         <Form
           form={form}

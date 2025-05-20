@@ -14,9 +14,9 @@ import {
   InputNumber,
   Select,
   Popconfirm,
-  message,
   Divider,
   Typography,
+  App,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -71,6 +71,7 @@ interface SupplyFormValues {
 }
 
 export default function SupplyManagementPage() {
+  const { message } = App.useApp();
   const [date, setDate] = useState(dayjs());
   const [supplies, setSupplies] = useState<Supply[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);

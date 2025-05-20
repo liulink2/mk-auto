@@ -14,9 +14,9 @@ import {
   InputNumber,
   Select,
   Popconfirm,
-  message,
   Typography,
   Divider,
+  App,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -45,6 +45,7 @@ interface ExpenseFormValues {
 }
 
 export default function ExpenseManagementPage() {
+  const { message } = App.useApp();
   const [date, setDate] = useState(dayjs());
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);

@@ -19,6 +19,9 @@ export async function GET(request: NextRequest) {
 
     const carServices = await prisma.carService.findMany({
       where,
+      include: {
+        carServiceItems: true,
+      },
       orderBy: {
         carInDateTime: "desc",
       },

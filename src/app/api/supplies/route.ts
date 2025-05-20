@@ -7,7 +7,6 @@ type Params = Promise<{ id: string }>;
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    console.log("searchParams", searchParams);
     const month = searchParams.get("month");
     const year = searchParams.get("year");
 

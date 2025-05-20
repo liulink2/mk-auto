@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         username,
         password: hashedPassword,
         role: isFirstUser ? "ADMIN" : "MANAGER",
+        isActive: isFirstUser ? true : false,
       },
     });
 

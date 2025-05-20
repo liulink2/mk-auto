@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, Row, Col, Statistic, DatePicker, message } from "antd";
+import { Card, Row, Col, Statistic, DatePicker, App } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 
 export default function DashboardPage() {
+  const { message } = App.useApp();
   const [selectedMonthYear, setSelectedMonthYear] = useState(dayjs());
   const [summary, setSummary] = useState({
     carServicesTotal: 0,

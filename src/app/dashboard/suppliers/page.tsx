@@ -4,12 +4,12 @@ import {
   Button,
   Space,
   Popconfirm,
-  message,
   Input,
   Modal,
   Form,
   Table,
   Select,
+  App,
 } from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -31,6 +31,7 @@ interface Supplier {
 }
 
 export default function SuppliersPage() {
+  const { message } = App.useApp();
   const { data: session } = useSession();
   const router = useRouter();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -220,10 +221,6 @@ export default function SuppliersPage() {
       ),
     },
   ];
-
-  if (session?.user?.role !== "ADMIN") {
-    return null;
-  }
 
   return (
     <div>

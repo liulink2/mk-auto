@@ -12,10 +12,10 @@ import {
   Space,
   Card,
   Select,
-  message,
   Tag,
   Popconfirm,
   AutoComplete,
+  App,
 } from "antd";
 import {
   PlusOutlined,
@@ -54,6 +54,7 @@ interface CarService {
 }
 
 export default function CarServicesPage() {
+  const { message } = App.useApp();
   const [carServices, setCarServices] = useState<CarService[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCarService, setEditingCarService] = useState<CarService | null>(

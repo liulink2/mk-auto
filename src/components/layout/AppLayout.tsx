@@ -63,12 +63,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
       label: "Car Services",
       onClick: () => router.push("/dashboard/car-services"),
     },
-    {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
-      onClick: () => router.push("/dashboard/settings"),
-    },
   ];
 
   if (!session) {
