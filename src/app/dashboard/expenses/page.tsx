@@ -197,44 +197,42 @@ export default function ExpenseManagementPage() {
 
   const handleSubmit = async (values: ExpenseFormValues) => {
     try {
-      const response = await fetch("/api/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const response = editingExpense
+        ? await fetch(`/api/expenses/${editingExpense.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(values),
+          })
+        : await fetch("/api/expenses", {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(values),
+          });
 
       if (!response.ok) {
-        throw new Error("Failed to create expense");
+        throw new Error(
+          editingExpense
+            ? "Failed to update expense"
+            : "Failed to create expense"
+        );
       }
 
-      message.success("Expense created successfully");
+      message.success(
+        editingExpense
+          ? "Expense updated successfully"
+          : "Expense created successfully"
+      );
+
       setIsModalVisible(false);
       expenseForm.resetFields();
       fetchExpenses(date);
     } catch {
-      message.error("Failed to create expense");
-    }
-  };
-
-  const handleEditSubmit = async (values: ExpenseFormValues) => {
-    if (!editingExpense) return;
-    try {
-      const response = await fetch(`/api/expenses/${editingExpense.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...values,
-          issuedDate: values.issuedDate.toISOString(),
-        }),
-      });
-      if (!response.ok) throw new Error("Failed to update expense");
-      message.success("Expense updated successfully");
-      setIsModalVisible(false);
-      fetchExpenses(date);
-    } catch {
-      message.error("Failed to update expense");
+      message.error(
+        editingExpense ? "Failed to update expense" : "Failed to create expense"
+      );
     }
   };
 

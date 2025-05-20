@@ -11,8 +11,6 @@ import {
   Select,
   App,
 } from "antd";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
   PlusOutlined,
@@ -32,8 +30,6 @@ interface Supplier {
 
 export default function SuppliersPage() {
   const { message } = App.useApp();
-  const { data: session } = useSession();
-  const router = useRouter();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
