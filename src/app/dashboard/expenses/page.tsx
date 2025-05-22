@@ -119,12 +119,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         <Input.TextArea />
       </Form.Item>
 
-      <Form.Item>
+      <Form.Item className="flex justify-end">
         <Space>
+          <Button danger onClick={onCancel}>
+            Cancel
+          </Button>
           <Button type="primary" htmlType="submit">
             {submitText}
           </Button>
-          <Button onClick={onCancel}>Cancel</Button>
         </Space>
       </Form.Item>
     </Form>

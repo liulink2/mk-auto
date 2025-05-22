@@ -565,12 +565,14 @@ export default function SupplyManagementPage() {
             </div>
           </div>
 
-          <Form.Item>
+          <Form.Item className="flex justify-end">
             <Space>
+              <Button danger onClick={handleAddCancel}>
+                Cancel
+              </Button>
               <Button type="primary" htmlType="submit">
                 Create
               </Button>
-              <Button onClick={handleAddCancel}>Cancel</Button>
             </Space>
           </Form.Item>
         </Form>
@@ -669,12 +671,14 @@ export default function SupplyManagementPage() {
           <Form.Item name="remarks" label="Remarks">
             <Input.TextArea />
           </Form.Item>
-          <Form.Item>
+          <Form.Item className="flex justify-end">
             <Space>
+              <Button danger onClick={handleEditCancel}>
+                Cancel
+              </Button>
               <Button type="primary" htmlType="submit">
                 Update
               </Button>
-              <Button onClick={handleEditCancel}>Cancel</Button>
             </Space>
           </Form.Item>
         </Form>
