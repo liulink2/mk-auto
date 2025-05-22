@@ -102,6 +102,8 @@ model Supply {
   description   String?
   quantity      Int
   price         Decimal
+  totalAmount   Decimal?
+  gstAmount     Decimal?
   paymentType   PaymentType
   remarks       String?
   suppliedDate  DateTime

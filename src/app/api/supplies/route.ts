@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
       },
     });
     return NextResponse.json(supplies);
-  } catch {
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Failed to fetch supplies" },
       { status: 500 }

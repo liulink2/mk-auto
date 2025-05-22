@@ -35,7 +35,8 @@ interface SupplyItem {
   description?: string;
   quantity: number;
   price: number;
-  amount: number;
+  totalAmount: number;
+  gstAmount: number;
 }
 
 interface Supplier {
@@ -54,6 +55,8 @@ interface Supply {
   description?: string;
   quantity: number;
   price: number;
+  totalAmount: number;
+  gstAmount: number;
   paymentType: "CASH" | "CARD";
   remarks?: string;
   suppliedDate: string;
@@ -169,6 +172,8 @@ export default function SupplyManagementPage() {
         description: item.description,
         quantity: item.quantity,
         price: item.price,
+        totalAmount: item.totalAmount,
+        gstAmount: item.gstAmount,
       }));
 
       const response = await fetch("/api/supplies/bulk", {
@@ -198,18 +203,40 @@ export default function SupplyManagementPage() {
   ) => {
     if (allValues.items) {
       let totalAmount = 0;
+      let totalGstAmount = 0;
       allValues.items.forEach((item: SupplyItem) => {
-        item.amount = item.quantity * item.price;
-        totalAmount += item.amount;
+        const itemPrice = item.price * item.quantity;
+        item.gstAmount = Math.round(itemPrice * 0.1 * 100) / 100;
+        item.totalAmount = Math.round((itemPrice + item.gstAmount) * 100) / 100;
+        // update total amount and gst amount
+        totalAmount += item.totalAmount;
+        totalGstAmount += item.gstAmount;
       });
       addForm.setFieldsValue({
         totalAmount,
+        totalGstAmount,
         items: allValues.items,
       });
     }
   };
 
-  const handleEditSubmit = async (values: SupplyFormValues) => {
+  const handleEditValuesChange = (
+    changedValues: Partial<Supply>,
+    allValues: Supply
+  ) => {
+    if (changedValues.price || changedValues.quantity) {
+      const itemPrice = (allValues.price ?? 0) * (allValues.quantity ?? 0);
+      const gstAmount = Math.round(itemPrice * 0.1 * 100) / 100;
+      const totalAmount = Math.round((itemPrice + gstAmount) * 100) / 100;
+      editForm.setFieldsValue({
+        ...allValues,
+        gstAmount,
+        totalAmount,
+      });
+    }
+  };
+
+  const handleEditSubmit = async (values: Supply) => {
     if (!editingSupply) return;
     try {
       const response = await fetch(`/api/supplies/${editingSupply.id}`, {
@@ -217,7 +244,6 @@ export default function SupplyManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...values,
-          suppliedDate: values.suppliedDate.toISOString(),
         }),
       });
       if (!response.ok) throw new Error("Failed to update supply");
@@ -288,14 +314,26 @@ export default function SupplyManagementPage() {
       width: 100,
     },
     {
-      title: "Total",
-      key: "total",
+      title: "GST",
+      dataIndex: "gstAmount",
+      key: "gstAmount",
       render: (_, record) => {
-        const total = record.quantity * record.price;
         return new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD",
-        }).format(total);
+        }).format(record.gstAmount);
+      },
+      width: 100,
+    },
+    {
+      title: "Total",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
+      render: (_, record) => {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(record.totalAmount);
       },
       width: 100,
     },
@@ -477,7 +515,7 @@ export default function SupplyManagementPage() {
                         rules={[
                           { required: true, message: "Please enter item name" },
                         ]}
-                        className="col-span-8"
+                        className="col-span-7"
                       >
                         <Input />
                       </Form.Item>
@@ -511,15 +549,19 @@ export default function SupplyManagementPage() {
                       </Form.Item>
                       <Form.Item
                         {...restField}
-                        name={[name, "amount"]}
-                        label="Amount"
+                        name={[name, "gstAmount"]}
+                        label="GST"
+                        className="col-span-1"
+                      >
+                        <InputNumber style={{ width: "100%" }} prefix="$" />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "totalAmount"]}
+                        label="Total"
                         className="col-span-2"
                       >
-                        <InputNumber
-                          style={{ width: "100%" }}
-                          disabled
-                          prefix="$"
-                        />
+                        <InputNumber style={{ width: "100%" }} prefix="$" />
                       </Form.Item>
                     </div>
                     <div>
@@ -551,12 +593,23 @@ export default function SupplyManagementPage() {
 
           <div className="flex justify-end mb-4">
             <div className="text-right text-xl">
+              GST Amount:
+              <div className="text-xl font-bold">
+                <Form.Item name="totalGstAmount" className="text-xl font-bold">
+                  <InputNumber
+                    style={{ width: "100%" }}
+                    prefix="$"
+                    size="large"
+                  />
+                </Form.Item>
+              </div>
+            </div>
+            <div className="text-right text-xl ml-4">
               Total Amount:
               <div className="text-xl font-bold">
                 <Form.Item name="totalAmount" className="text-xl font-bold">
                   <InputNumber
                     style={{ width: "100%" }}
-                    disabled
                     prefix="$"
                     size="large"
                   />
@@ -585,7 +638,12 @@ export default function SupplyManagementPage() {
         footer={null}
         width={1000}
       >
-        <Form form={editForm} layout="vertical" onFinish={handleEditSubmit}>
+        <Form<Supply>
+          form={editForm}
+          layout="vertical"
+          onFinish={handleEditSubmit}
+          onValuesChange={handleEditValuesChange}
+        >
           <div className="grid grid-cols-12 gap-4">
             <Form.Item
               name="suppliedDate"
@@ -634,7 +692,7 @@ export default function SupplyManagementPage() {
               name="name"
               label="Name"
               rules={[{ required: true, message: "Please enter item name" }]}
-              className="col-span-8"
+              className="col-span-6"
             >
               <Input />
             </Form.Item>
@@ -642,7 +700,7 @@ export default function SupplyManagementPage() {
               name="quantity"
               label="Quantity"
               rules={[{ required: true, message: "Please enter quantity" }]}
-              className="col-span-2"
+              className="col-span-1"
             >
               <InputNumber min={1} style={{ width: "100%" }} />
             </Form.Item>
@@ -663,6 +721,12 @@ export default function SupplyManagementPage() {
                   value ? Number(value.replace(/\$\s?|(,*)/g, "")) : 0
                 }
               />
+            </Form.Item>
+            <Form.Item name="gstAmount" label="GST" className="col-span-1">
+              <InputNumber style={{ width: "100%" }} prefix="$" />
+            </Form.Item>
+            <Form.Item name="totalAmount" label="Total" className="col-span-2">
+              <InputNumber style={{ width: "100%" }} prefix="$" />
             </Form.Item>
           </div>
           <Form.Item name="description" label="Description">

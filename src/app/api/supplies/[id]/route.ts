@@ -23,6 +23,8 @@ export async function PUT(request: Request, { params }: { params: Params }) {
         description: data.description,
         quantity: data.quantity,
         price: data.price,
+        totalAmount: data.totalAmount,
+        gstAmount: data.gstAmount,
       },
       include: {
         supplier: true,
