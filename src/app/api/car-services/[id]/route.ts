@@ -70,6 +70,12 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
+    // First delete all related car service items
+    await prisma.carServiceItem.deleteMany({
+      where: { carServiceId: id },
+    });
+
+    // Then delete the car service
     await prisma.carService.delete({
       where: { id },
     });
