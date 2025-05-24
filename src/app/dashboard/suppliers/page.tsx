@@ -47,6 +47,10 @@ export default function SuppliersPage() {
       }
 
       const data = await response.json();
+      data.forEach((supplier: Supplier) => {
+        // remove children to avoid nested table
+        supplier.children = undefined;
+      });
       setSuppliers(data);
     } catch (error) {
       console.error("Error fetching suppliers:", error);
@@ -231,15 +235,12 @@ export default function SuppliersPage() {
         </Button>
       </div>
 
-      <Table
+      <Table<Supplier>
         columns={columns}
         dataSource={suppliers}
         rowKey="id"
         loading={loading}
-        expandable={{
-          rowExpandable: () => false,
-          expandedRowRender: () => null,
-        }}
+        pagination={false}
       />
 
       <Modal

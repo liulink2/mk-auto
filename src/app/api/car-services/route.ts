@@ -40,30 +40,25 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const { carServiceItems, ...rest } = body;
     const carInDateTime = new Date(body.carInDateTime);
 
     // Create the CarService first
     const carService = await prisma.carService.create({
       data: {
-        carPlate: body.carPlate,
-        carDetails: body.carDetails,
-        ownerName: body.ownerName,
-        phoneNo: body.phoneNo,
+        ...rest,
         carInDateTime,
+        year: carInDateTime.getFullYear(),
+        month: carInDateTime.getMonth() + 1,
         carOutDateTime: body.carOutDateTime
           ? new Date(body.carOutDateTime)
           : null,
-        totalAmount: body.totalAmount,
-        paidInCash: body.paidInCash,
-        paidInCard: body.paidInCard,
-        year: carInDateTime.getFullYear(),
-        month: carInDateTime.getMonth() + 1,
       },
     });
 
     // Create CarServiceItems
-    if (body.carServiceItems && body.carServiceItems.length > 0) {
-      const carServiceItemsData = body.carServiceItems.map(
+    if (carServiceItems && carServiceItems.length > 0) {
+      const carServiceItemsData = carServiceItems.map(
         (item: CarServiceItem) => ({
           ...item,
           carServiceId: carService.id,

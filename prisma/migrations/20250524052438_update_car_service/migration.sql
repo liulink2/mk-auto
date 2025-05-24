@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "CarService" ALTER COLUMN "paidInCash" DROP NOT NULL,
+ALTER COLUMN "paidInCard" DROP NOT NULL;

@@ -28,6 +28,11 @@ enum ServiceType {
   PARTS
 }
 
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -102,8 +107,8 @@ model Supply {
   description   String?
   quantity      Int
   price         Decimal
-  totalAmount   Decimal?
-  gstAmount     Decimal?
+  totalAmount   Decimal
+  gstAmount     Decimal
   paymentType   PaymentType
   remarks       String?
   suppliedDate  DateTime
@@ -152,8 +157,12 @@ model CarService {
   carInDateTime DateTime
   carOutDateTime DateTime?
   totalAmount   Float
-  paidInCash    Float
-  paidInCard    Float
+  discountType  DiscountType?
+  discountAmount Float?
+  finalAmount   Float
+  gstAmount     Float?
+  paidInCash    Float?
+  paidInCard    Float?
   year          Int
   month         Int
   createdAt     DateTime        @default(now())

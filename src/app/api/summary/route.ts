@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
 
       const supplies = await prisma.supply.findMany({
         where: { year },
-        select: { quantity: true, price: true },
+        select: { totalAmount: true },
       });
       const suppliesTotal = supplies.reduce((total, supply) => {
-        return total + Number(supply.quantity) * Number(supply.price);
+        return total + Number(supply.totalAmount);
       }, 0);
 
       const expensesTotal = await prisma.expense.aggregate({
@@ -46,10 +46,10 @@ export async function GET(request: NextRequest) {
 
     const supplies = await prisma.supply.findMany({
       where: { month, year },
-      select: { quantity: true, price: true },
+      select: { totalAmount: true },
     });
     const suppliesTotal = supplies.reduce((total, supply) => {
-      return total + Number(supply.quantity) * Number(supply.price);
+      return total + Number(supply.totalAmount);
     }, 0);
 
     const expensesTotal = await prisma.expense.aggregate({

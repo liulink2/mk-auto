@@ -16,6 +16,7 @@ import {
   Popconfirm,
   AutoComplete,
   App,
+  Popover,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,9 +24,17 @@ import {
   DeleteOutlined,
   MinusCircleOutlined,
   CheckOutlined,
+  PhoneOutlined,
+  InfoCircleOutlined,
+  UserOutlined,
+  CarOutlined,
+  CreditCardOutlined,
+  DollarOutlined,
+  LeftSquareTwoTone,
+  RightSquareTwoTone,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
-import { debounce } from "lodash";
+import { debounce, forEach, values } from "lodash";
 import { Supply } from "@prisma/client";
 
 interface CarServiceItem {
@@ -46,11 +55,15 @@ interface CarService {
   carInDateTime: string;
   carOutDateTime?: string;
   totalAmount: number;
-  paidInCash: number;
-  paidInCard: number;
+  gstAmount?: number;
+  paidInCash?: number;
+  paidInCard?: number;
   year: number;
   month: number;
   carServiceItems: CarServiceItem[];
+  discountType?: "PERCENTAGE" | "FIXED";
+  discountAmount?: number;
+  finalAmount: number;
 }
 
 export default function CarServicesPage() {
@@ -111,6 +124,8 @@ export default function CarServicesPage() {
     form.setFieldsValue({
       carInDateTime: dayjs(),
       totalAmount: 0,
+      gstAmount: 0,
+      finalAmount: 0,
       paidInCash: 0,
       paidInCard: 0,
       carServiceItems: [
@@ -152,6 +167,7 @@ export default function CarServicesPage() {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       const values = await form.validateFields();
       const carInDateTime = values.carInDateTime.toISOString();
       const carOutDateTime = values.carOutDateTime?.toISOString();
@@ -186,75 +202,126 @@ export default function CarServicesPage() {
       fetchCarServices(selectedMonthYear);
     } catch {
       message.error("Failed to submit car service");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleValuesChange = (
-    _: Partial<CarService>,
-    allValues: CarService
-  ) => {
-    if (!allValues.carServiceItems) return;
+  const handleValuesChange = (_: Partial<CarService>, values: CarService) => {
+    if (!values.carServiceItems) return;
 
     let totalAmount = 0;
-    allValues.carServiceItems.forEach((item: CarServiceItem) => {
-      item.totalAmount = item.price ?? 0 * item.quantity ?? 0;
-      totalAmount += item.totalAmount;
+    let finalAmount = 0;
+    const carServiceItems = values.carServiceItems.map((item) => {
+      const amount = (item.price ?? 0) * (item.quantity ?? 0);
+      totalAmount += amount;
+      return {
+        ...item,
+        totalAmount: amount,
+      };
     });
-    form.setFieldsValue({ ...allValues, totalAmount });
+    if (values.discountType && values.discountAmount) {
+      if (values.discountType === "PERCENTAGE") {
+        finalAmount =
+          totalAmount - (totalAmount * (values.discountAmount ?? 0)) / 100;
+      } else {
+        finalAmount = totalAmount - (values.discountAmount ?? 0);
+      }
+    } else {
+      finalAmount = totalAmount;
+    }
+
+    const gstAmount = Math.round(finalAmount * 0.1 * 100) / 100;
+
+    form.setFieldsValue({
+      ...values,
+      carServiceItems,
+      totalAmount,
+      finalAmount,
+      gstAmount,
+    });
   };
 
   const columns = [
     {
-      title: "Car Plate",
-      dataIndex: "carPlate",
-      key: "carPlate",
-      render: (text: string) => <Tag color="default">{text.toUpperCase()}</Tag>,
-    },
-    {
       title: "Car Details",
-      dataIndex: "carDetails",
-      key: "carDetails",
+      key: "carInfo",
+      render: (_: string, record: CarService) => (
+        <>
+          <div>
+            <CarOutlined />{" "}
+            <Tag color="default">{record.carPlate.toUpperCase()}</Tag>
+            {record.carDetails && (
+              <Popover content={record.carDetails} title="Details">
+                <InfoCircleOutlined
+                  style={{ cursor: "pointer", color: "blue" }}
+                />
+              </Popover>
+            )}
+          </div>
+          <div className="font-bold">
+            <UserOutlined /> {record.ownerName}
+          </div>
+          <div>
+            <PhoneOutlined /> {record.phoneNo}
+          </div>
+        </>
+      ),
     },
     {
-      title: "Owner Name",
-      dataIndex: "ownerName",
-      key: "ownerName",
+      title: "In / Out",
+      key: "carInOut",
+      render: (_: string, record: CarService) => (
+        <>
+          <div>
+            <LeftSquareTwoTone twoToneColor="#52c41a" />{" "}
+            {dayjs(record.carInDateTime).format("DD-MM-YYYY HH:mm")}
+          </div>
+          <div>
+            <RightSquareTwoTone twoToneColor="#ff4d4f" />{" "}
+            {record.carOutDateTime
+              ? dayjs(record.carOutDateTime).format("DD-MM-YYYY HH:mm")
+              : "..."}
+          </div>
+        </>
+      ),
     },
     {
-      title: "Phone No",
-      dataIndex: "phoneNo",
-      key: "phoneNo",
+      title: "Services",
+      key: "carServiceItems",
+      render: (_: string, record: CarService) => {
+        return (
+          <div>
+            {record.carServiceItems.map((item, index) => (
+              <div key={item.id}>
+                {index + 1}. {item.name} x{item.quantity}
+              </div>
+            ))}
+          </div>
+        );
+      },
     },
     {
-      title: "Car In Date",
-      dataIndex: "carInDateTime",
-      key: "carInDateTime",
-      render: (text: string) => dayjs(text).format("DD-MM-YYYY HH:mm"),
-    },
-    {
-      title: "Car Out Date",
-      dataIndex: "carOutDateTime",
-      key: "carOutDateTime",
-      render: (text: string) =>
-        text ? dayjs(text).format("DD-MM-YYYY HH:mm") : "-",
-    },
-    {
-      title: "Total Amount",
-      dataIndex: "totalAmount",
-      key: "totalAmount",
+      title: "Final Amount",
+      dataIndex: "finalAmount",
+      key: "finalAmount",
       render: (text: number) => `$${text.toFixed(2)}`,
     },
     {
-      title: "Paid in Cash",
-      dataIndex: "paidInCash",
-      key: "paidInCash",
-      render: (text: number) => `$${text.toFixed(2)}`,
-    },
-    {
-      title: "Paid in Card",
-      dataIndex: "paidInCard",
-      key: "paidInCard",
-      render: (text: number) => `$${text.toFixed(2)}`,
+      title: "Payment",
+      key: "payment",
+      render: (_: string, record: CarService) => {
+        return (
+          <>
+            <div>
+              <DollarOutlined /> ${record.paidInCash}
+            </div>
+            <div>
+              <CreditCardOutlined /> ${record.paidInCard}
+            </div>
+          </>
+        );
+      },
     },
     {
       title: "Status",
@@ -262,12 +329,12 @@ export default function CarServicesPage() {
       render: (_: string, record: CarService) => {
         return (
           <>
-            {!record.carOutDateTime ? (
-              <Tag color="green">Active</Tag>
-            ) : (
-              <Tag color="blue">Completed</Tag>
+            {record.discountType && record.discountAmount && (
+              <Tag color="green">Discount</Tag>
             )}
-            {record.totalAmount - record.paidInCash - record.paidInCard !==
+            {record.finalAmount -
+              (record.paidInCash ?? 0) -
+              (record.paidInCard ?? 0) !==
               0 && <Tag color="red">Payment</Tag>}
           </>
         );
@@ -303,11 +370,11 @@ export default function CarServicesPage() {
       0
     );
     const totalCash = carServices.reduce(
-      (sum, service) => sum + service.paidInCash,
+      (sum, service) => sum + (service.paidInCash ?? 0),
       0
     );
     const totalCard = carServices.reduce(
-      (sum, service) => sum + service.paidInCard,
+      (sum, service) => sum + (service.paidInCard ?? 0),
       0
     );
 
@@ -371,6 +438,7 @@ export default function CarServicesPage() {
         title={editingCarService ? "Edit Car Service" : "Add Car Service"}
         open={isModalVisible}
         onOk={handleSubmit}
+        confirmLoading={loading}
         onCancel={() => setIsModalVisible(false)}
         width={1200}
       >
@@ -507,7 +575,15 @@ export default function CarServicesPage() {
                   ))}
                   <Button
                     type="dashed"
-                    onClick={() => add()}
+                    onClick={() =>
+                      add({
+                        serviceType: "SERVICE",
+                        name: "",
+                        price: 0,
+                        quantity: 1,
+                        totalAmount: 0,
+                      })
+                    }
                     block
                     icon={<PlusOutlined />}
                   >
@@ -518,34 +594,41 @@ export default function CarServicesPage() {
             </Form.List>
           </div>
           <div className="flex justify-end">
-            <Form.Item
-              name="totalAmount"
-              label="Total Amount"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                size="large"
-                style={{ width: "100%" }}
-                prefix="$"
-                disabled
-              />
+            <Form.Item name="totalAmount" label="Total Amount">
+              <InputNumber style={{ width: "100%" }} prefix="$" disabled />
             </Form.Item>
           </div>
+          <div className="flex justify-end gap-4">
+            <Form.Item name="discountType" label="Discount Type">
+              <Select>
+                <Select.Option value="PERCENTAGE">Percentage</Select.Option>
+                <Select.Option value="FIXED">Fixed</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="discountAmount" label="Discount Value">
+              <InputNumber style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item name="finalAmount" label="Final Amount">
+              <InputNumber style={{ width: "100%" }} prefix="$" disabled />
+            </Form.Item>
+          </div>
+          <div className="flex justify-end gap-4">
+            <Form.Item name="gstAmount" label="GST Amount">
+              <InputNumber style={{ width: "100%" }} prefix="$" disabled />
+            </Form.Item>
+          </div>
+
           <div className="flex gap-4 justify-end items-center">
             <Button
               type="primary"
               icon={<CheckOutlined />}
               onClick={() => {
                 form.setFieldsValue({
-                  paidInCash: form.getFieldValue("totalAmount"),
+                  paidInCash: form.getFieldValue("finalAmount"),
                 });
               }}
             />
-            <Form.Item
-              name="paidInCash"
-              label="Paid in Cash"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="paidInCash" label="Paid in Cash">
               <InputNumber style={{ width: "100%" }} prefix="$" />
             </Form.Item>
           </div>
@@ -555,15 +638,11 @@ export default function CarServicesPage() {
               icon={<CheckOutlined />}
               onClick={() => {
                 form.setFieldsValue({
-                  paidInCard: form.getFieldValue("totalAmount"),
+                  paidInCard: form.getFieldValue("finalAmount"),
                 });
               }}
             />
-            <Form.Item
-              name="paidInCard"
-              label="Paid in Card"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="paidInCard" label="Paid in Card">
               <InputNumber style={{ width: "100%" }} prefix="$" />
             </Form.Item>
           </div>

@@ -199,6 +199,7 @@ export default function ExpenseManagementPage() {
 
   const handleSubmit = async (values: ExpenseFormValues) => {
     try {
+      console.log(values);
       const response = editingExpense
         ? await fetch(`/api/expenses/${editingExpense.id}`, {
             method: "PUT",
@@ -208,6 +209,7 @@ export default function ExpenseManagementPage() {
             body: JSON.stringify(values),
           })
         : await fetch("/api/expenses", {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },

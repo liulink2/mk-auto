@@ -12,37 +12,32 @@ export async function PUT(
   const { id } = await params;
   try {
     const body = await request.json();
+    const { carServiceItems, ...rest } = body;
     const carInDateTime = new Date(body.carInDateTime);
 
     // Update the CarService
     const carService = await prisma.carService.update({
       where: { id },
       data: {
-        carPlate: body.carPlate,
-        carDetails: body.carDetails,
-        ownerName: body.ownerName,
-        phoneNo: body.phoneNo,
+        ...rest,
         carInDateTime,
         carOutDateTime: body.carOutDateTime
           ? new Date(body.carOutDateTime)
           : null,
-        totalAmount: body.totalAmount,
-        paidInCash: body.paidInCash,
-        paidInCard: body.paidInCard,
         year: carInDateTime.getFullYear(),
         month: carInDateTime.getMonth() + 1,
       },
     });
 
     // Update CarServiceItems
-    if (body.carServiceItems && body.carServiceItems.length > 0) {
+    if (carServiceItems && carServiceItems.length > 0) {
       // Delete existing items
       await prisma.carServiceItem.deleteMany({
         where: { carServiceId: id },
       });
 
       // Create new items
-      const carServiceItemsData = body.carServiceItems.map(
+      const carServiceItemsData = carServiceItems.map(
         (item: CarServiceItem) => ({
           ...item,
           carServiceId: id,

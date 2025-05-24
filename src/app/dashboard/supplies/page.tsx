@@ -412,7 +412,7 @@ export default function SupplyManagementPage() {
                 currency: "USD",
               }).format(
                 supplies.reduce(
-                  (sum, supply) => sum + supply.quantity * supply.price,
+                  (sum, supply) => sum + Number(supply.totalAmount),
                   0
                 )
               )}
@@ -763,9 +763,8 @@ export default function SupplyManagementPage() {
             <div className="grid grid-cols-2 gap-4">
               {Object.entries(
                 supplies.reduce((acc: { [key: string]: number }, supply) => {
-                  const amount = supply.quantity * supply.price;
                   acc[supply.paymentType] =
-                    (acc[supply.paymentType] || 0) + amount;
+                    (acc[supply.paymentType] || 0) + Number(supply.totalAmount);
                   return acc;
                 }, {})
               ).map(([type, amount]) => (
@@ -802,15 +801,15 @@ export default function SupplyManagementPage() {
                   const supplier = supply.supplier;
                   const parentName =
                     supplier.parent?.name || "Independent Suppliers";
-                  const amount = supply.quantity * supply.price;
 
                   if (!acc[parentName]) {
                     acc[parentName] = { total: 0, children: {} };
                   }
 
-                  acc[parentName].total += amount;
+                  acc[parentName].total += Number(supply.totalAmount);
                   acc[parentName].children[supplier.name] =
-                    (acc[parentName].children[supplier.name] || 0) + amount;
+                    (acc[parentName].children[supplier.name] || 0) +
+                    Number(supply.totalAmount);
 
                   return acc;
                 },
