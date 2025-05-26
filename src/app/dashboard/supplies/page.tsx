@@ -82,6 +82,11 @@ export default function SupplyManagementPage() {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isSummaryModalVisible, setIsSummaryModalVisible] = useState(false);
+  const [isInvoiceDetailsModalVisible, setIsInvoiceDetailsModalVisible] =
+    useState(false);
+  const [selectedInvoiceItems, setSelectedInvoiceItems] = useState<Supply[]>(
+    []
+  );
   const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
@@ -270,6 +275,14 @@ export default function SupplyManagementPage() {
     }
   };
 
+  const showInvoiceDetails = (invoiceNumber: string) => {
+    const invoiceItems = supplies.filter(
+      (supply) => supply.invoiceNumber === invoiceNumber
+    );
+    setSelectedInvoiceItems(invoiceItems);
+    setIsInvoiceDetailsModalVisible(true);
+  };
+
   const columns: ColumnsType<Supply> = [
     {
       title: "Date",
@@ -288,6 +301,11 @@ export default function SupplyManagementPage() {
       dataIndex: "invoiceNumber",
       key: "invoiceNumber",
       width: 200,
+      render: (invoiceNumber: string) => (
+        <Button type="link" onClick={() => showInvoiceDetails(invoiceNumber)}>
+          {invoiceNumber}
+        </Button>
+      ),
     },
     {
       title: "Name",
@@ -843,6 +861,84 @@ export default function SupplyManagementPage() {
               </div>
             ))}
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        title="Invoice Details"
+        open={isInvoiceDetailsModalVisible}
+        onCancel={() => setIsInvoiceDetailsModalVisible(false)}
+        footer={null}
+        width={1000}
+      >
+        <Table
+          columns={[
+            {
+              title: "Name",
+              dataIndex: "name",
+              key: "name",
+            },
+            {
+              title: "Description",
+              dataIndex: "description",
+              key: "description",
+            },
+            {
+              title: "Quantity",
+              dataIndex: "quantity",
+              key: "quantity",
+            },
+            {
+              title: "Price",
+              dataIndex: "price",
+              key: "price",
+              render: (price: number) => {
+                return new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }).format(price);
+              },
+            },
+            {
+              title: "GST",
+              dataIndex: "gstAmount",
+              key: "gstAmount",
+              render: (amount: number) => {
+                return new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }).format(amount);
+              },
+            },
+            {
+              title: "Total",
+              dataIndex: "totalAmount",
+              key: "totalAmount",
+              render: (amount: number) => {
+                return new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }).format(amount);
+              },
+            },
+          ]}
+          dataSource={selectedInvoiceItems}
+          rowKey="id"
+          pagination={false}
+        />
+        <div className="mt-4 text-right">
+          <Text strong>Total Amount: </Text>
+          <Text strong className="text-lg">
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(
+              selectedInvoiceItems.reduce(
+                (sum, item) => sum + Number(item.totalAmount),
+                0
+              )
+            )}
+          </Text>
         </div>
       </Modal>
     </div>
