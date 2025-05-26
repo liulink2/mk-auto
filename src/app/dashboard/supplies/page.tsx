@@ -295,6 +295,7 @@ export default function SupplyManagementPage() {
       title: "Supplier",
       dataIndex: ["supplier", "name"],
       key: "supplier",
+      width: 200,
     },
     {
       title: "Invoice Number",
