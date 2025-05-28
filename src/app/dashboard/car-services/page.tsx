@@ -255,7 +255,6 @@ export default function CarServicesPage() {
   const handlePrint = () => {
     const printContent = document.getElementById("invoice-content");
     if (printContent) {
-      const originalContent = document.body.innerHTML;
       const printWindow = window.open("", "_blank");
       if (printWindow) {
         printWindow.document.write(`
