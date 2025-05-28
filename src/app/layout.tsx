@@ -4,6 +4,7 @@ import "./globals.css";
 import "@ant-design/v5-patch-for-react-19";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { CompanySettingsProvider } from "@/contexts/CompanySettingsContext";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${inter.className}`}
       >
-        <Providers>{children}</Providers>
+        <CompanySettingsProvider>
+          <Providers>{children}</Providers>
+        </CompanySettingsProvider>
       </body>
     </html>
   );

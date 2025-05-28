@@ -38,6 +38,7 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
 import { Supply } from "@prisma/client";
+import { useCompanySettings } from "@/contexts/CompanySettingsContext";
 
 interface CarServiceItem {
   id: string;
@@ -70,6 +71,7 @@ interface CarService {
 
 export default function CarServicesPage() {
   const { message } = App.useApp();
+  const companySettings = useCompanySettings();
   const [carServices, setCarServices] = useState<CarService[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
@@ -289,6 +291,8 @@ export default function CarServicesPage() {
                 .mt-8 { margin-top: 2rem; }
                 .pt-4 { padding-top: 1rem; }
                 .border-t { border-top: 1px solid #ddd; }
+                .company-info { margin-bottom: 2rem; }
+                .company-info p { margin: 0.25rem 0; }
                 @media print {
                   body { 
                     margin: 0;
@@ -730,7 +734,6 @@ export default function CarServicesPage() {
       </Modal>
 
       <Modal
-        title="Service Invoice"
         open={isInvoiceModalVisible}
         onCancel={() => setIsInvoiceModalVisible(false)}
         footer={[
@@ -747,8 +750,22 @@ export default function CarServicesPage() {
       >
         {selectedCarService && (
           <div id="invoice-content" className="p-6">
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold">
+                {companySettings.companyName}
+              </h1>
+              <div className="company-info">
+                <p>{companySettings.address}</p>
+                <p>Phone: {companySettings.phoneNumber}</p>
+                <p>Email: {companySettings.email}</p>
+                {companySettings.abn && <p>ABN: {companySettings.abn}</p>}
+                {companySettings.website && (
+                  <p>Website: {companySettings.website}</p>
+                )}
+              </div>
+            </div>
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold">Service Invoice</h1>
+              <h2 className="text-xl font-bold">Tax Invoice</h2>
               <p className="text-gray-600">Invoice #{selectedCarService.id}</p>
             </div>
 
@@ -808,21 +825,12 @@ export default function CarServicesPage() {
 
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <h2 className="font-bold mb-2">Service Times</h2>
+                <h2 className="font-bold mb-2">Service Date</h2>
                 <p>
-                  <LeftSquareTwoTone twoToneColor="#52c41a" /> In:{" "}
                   {dayjs(selectedCarService.carInDateTime).format(
                     "DD-MM-YYYY HH:mm"
                   )}
                 </p>
-                {selectedCarService.carOutDateTime && (
-                  <p>
-                    <RightSquareTwoTone twoToneColor="#ff4d4f" /> Out:{" "}
-                    {dayjs(selectedCarService.carOutDateTime).format(
-                      "DD-MM-YYYY HH:mm"
-                    )}
-                  </p>
-                )}
               </div>
               <div className="text-right">
                 <div className="mb-2">
@@ -840,13 +848,21 @@ export default function CarServicesPage() {
                   )}
 
                 <div className="text-xl font-bold">
-                  <span>Total:</span> $
+                  <span>Total incl. GST:</span> $
                   {selectedCarService.finalAmount.toFixed(2)}
                 </div>
                 <div className="mb-2">
-                  <span className="font-bold">GST:</span> $
+                  <span className="font-bold">GST amount:</span> $
                   {selectedCarService.gstAmount?.toFixed(2)}
                 </div>
+              </div>
+            </div>
+            <hr />
+            <div>
+              <div>Price includes GST</div>
+              <div>
+                All goods remain in the property of the vendor until the invoice
+                is paid in full.
               </div>
             </div>
           </div>
