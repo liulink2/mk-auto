@@ -365,8 +365,8 @@ export default function CarServicesPage() {
 
   const summary = useMemo(() => {
     const totalServices = carServices.length;
-    const totalAmount = carServices.reduce(
-      (sum, service) => sum + service.totalAmount,
+    const finalAmount = carServices.reduce(
+      (sum, service) => sum + service.finalAmount,
       0
     );
     const totalCash = carServices.reduce(
@@ -380,7 +380,7 @@ export default function CarServicesPage() {
 
     return {
       totalServices,
-      totalAmount,
+      finalAmount,
       totalCash,
       totalCard,
     };
@@ -411,7 +411,7 @@ export default function CarServicesPage() {
 
       <div className="grid grid-cols-4 gap-4">
         <Card title="Total Services">{summary.totalServices}</Card>
-        <Card title="Total Amount">${summary.totalAmount.toFixed(2)}</Card>
+        <Card title="Total Amount">${summary.finalAmount.toFixed(2)}</Card>
         <Card title="Paid in Cash">${summary.totalCash.toFixed(2)}</Card>
         <Card title="Paid in Card">${summary.totalCard.toFixed(2)}</Card>
       </div>

@@ -85,8 +85,8 @@ export default function DashboardPage() {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Year Car Services Total"
-              value={yearSummary.carServicesTotal}
+              title="Car Services Total"
+              value={yearSummary.carServicesTotal.toFixed(2)}
               prefix="$"
             />
           </Card>
@@ -94,8 +94,8 @@ export default function DashboardPage() {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Year Supplies Total"
-              value={yearSummary.suppliesTotal}
+              title="Supplies Total"
+              value={yearSummary.suppliesTotal.toFixed(2)}
               prefix="$"
             />
           </Card>
@@ -103,8 +103,8 @@ export default function DashboardPage() {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Year Expenses Total"
-              value={yearSummary.expensesTotal}
+              title="Expenses Total"
+              value={yearSummary.expensesTotal.toFixed(2)}
               prefix="$"
             />
           </Card>
@@ -112,8 +112,8 @@ export default function DashboardPage() {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Year Profit & Loss"
-              value={yearProfitLoss}
+              title="Profit & Loss"
+              value={yearProfitLoss.toFixed(2)}
               prefix="$"
               valueStyle={{ color: yearProfitLoss > 0 ? "green" : "red" }}
             />
@@ -127,7 +127,7 @@ export default function DashboardPage() {
           <Card>
             <Statistic
               title="Car Services Total"
-              value={summary.carServicesTotal}
+              value={summary.carServicesTotal.toFixed(2)}
               prefix="$"
             />
           </Card>
@@ -136,7 +136,7 @@ export default function DashboardPage() {
           <Card>
             <Statistic
               title="Supplies Total"
-              value={summary.suppliesTotal}
+              value={summary.suppliesTotal.toFixed(2)}
               prefix="$"
             />
           </Card>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
           <Card>
             <Statistic
               title="Expenses Total"
-              value={summary.expensesTotal}
+              value={summary.expensesTotal.toFixed(2)}
               prefix="$"
             />
           </Card>
@@ -154,7 +154,7 @@ export default function DashboardPage() {
           <Card>
             <Statistic
               title="Profit & Loss"
-              value={profitLoss}
+              value={profitLoss.toFixed(2)}
               prefix="$"
               valueStyle={{ color: profitLoss > 0 ? "green" : "red" }}
             />
