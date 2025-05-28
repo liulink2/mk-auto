@@ -33,6 +33,7 @@ import {
   LeftSquareTwoTone,
   RightSquareTwoTone,
   FileTextOutlined,
+  PrinterOutlined,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
@@ -249,6 +250,72 @@ export default function CarServicesPage() {
   const handleViewInvoice = (record: CarService) => {
     setSelectedCarService(record);
     setIsInvoiceModalVisible(true);
+  };
+
+  const handlePrint = () => {
+    const printContent = document.getElementById("invoice-content");
+    if (printContent) {
+      const originalContent = document.body.innerHTML;
+      const printWindow = window.open("", "_blank");
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Service Invoice</title>
+              <style>
+                @page {
+                  size: A4;
+                  margin: 0;
+                }
+                body { 
+                  font-family: Arial, sans-serif;
+                  margin: 0;
+                  padding: 20px;
+                }
+                .invoice-container { padding: 20px; }
+                .text-center { text-align: center; }
+                .mb-8 { margin-bottom: 2rem; }
+                .grid { display: grid; }
+                .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+                .gap-8 { gap: 2rem; }
+                .font-bold { font-weight: bold; }
+                .text-right { text-align: right; }
+                .border { border: 1px solid #ddd; }
+                .rounded-lg { border-radius: 0.5rem; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 8px; text-align: left; }
+                th { background-color: #f5f5f5; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .text-xl { font-size: 1.25rem; }
+                .mt-8 { margin-top: 2rem; }
+                .pt-4 { padding-top: 1rem; }
+                .border-t { border-top: 1px solid #ddd; }
+                @media print {
+                  body { 
+                    margin: 0;
+                    padding: 20px;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                  }
+                  .no-print { display: none; }
+                  @page {
+                    margin: 0;
+                    size: A4;
+                  }
+                }
+              </style>
+            </head>
+            <body>
+              ${printContent.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
   };
 
   const columns = [
@@ -667,11 +734,20 @@ export default function CarServicesPage() {
         title="Service Invoice"
         open={isInvoiceModalVisible}
         onCancel={() => setIsInvoiceModalVisible(false)}
-        footer={null}
+        footer={[
+          <Button
+            key="print"
+            type="primary"
+            icon={<PrinterOutlined />}
+            onClick={handlePrint}
+          >
+            Print Invoice
+          </Button>,
+        ]}
         width={800}
       >
         {selectedCarService && (
-          <div className="p-6">
+          <div id="invoice-content" className="p-6">
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold">Service Invoice</h1>
               <p className="text-gray-600">Invoice #{selectedCarService.id}</p>
