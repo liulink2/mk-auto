@@ -32,6 +32,7 @@ import {
   DollarOutlined,
   LeftSquareTwoTone,
   RightSquareTwoTone,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
@@ -70,6 +71,9 @@ export default function CarServicesPage() {
   const { message } = App.useApp();
   const [carServices, setCarServices] = useState<CarService[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  const [selectedCarService, setSelectedCarService] =
+    useState<CarService | null>(null);
   const [editingCarService, setEditingCarService] = useState<CarService | null>(
     null
   );
@@ -242,6 +246,11 @@ export default function CarServicesPage() {
     });
   };
 
+  const handleViewInvoice = (record: CarService) => {
+    setSelectedCarService(record);
+    setIsInvoiceModalVisible(true);
+  };
+
   const columns = [
     {
       title: "Car Details",
@@ -345,6 +354,11 @@ export default function CarServicesPage() {
       key: "actions",
       render: (_: string, record: CarService) => (
         <Space>
+          <Button
+            type="text"
+            icon={<FileTextOutlined />}
+            onClick={() => handleViewInvoice(record)}
+          />
           <Button
             type="text"
             icon={<EditOutlined />}
@@ -647,6 +661,121 @@ export default function CarServicesPage() {
             </Form.Item>
           </div>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Service Invoice"
+        open={isInvoiceModalVisible}
+        onCancel={() => setIsInvoiceModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        {selectedCarService && (
+          <div className="p-6">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold">Service Invoice</h1>
+              <p className="text-gray-600">Invoice #{selectedCarService.id}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div>
+                <h2 className="font-bold mb-2">Customer Information</h2>
+                <p>
+                  <UserOutlined /> {selectedCarService.ownerName}
+                </p>
+                <p>
+                  <PhoneOutlined /> {selectedCarService.phoneNo}
+                </p>
+              </div>
+              <div>
+                <h2 className="font-bold mb-2">Vehicle Information</h2>
+                <p>
+                  <CarOutlined /> {selectedCarService.carPlate.toUpperCase()}
+                </p>
+                {selectedCarService.carDetails && (
+                  <p>{selectedCarService.carDetails}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h2 className="font-bold mb-2">Service Details</h2>
+              <div className="border rounded-lg">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="p-2 text-left">Service/Part</th>
+                      <th className="p-2 text-right">Price</th>
+                      <th className="p-2 text-right">Quantity</th>
+                      <th className="p-2 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCarService.carServiceItems.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                      >
+                        <td className="p-2">{item.name}</td>
+                        <td className="p-2 text-right">
+                          ${item.price.toFixed(2)}
+                        </td>
+                        <td className="p-2 text-right">{item.quantity}</td>
+                        <td className="p-2 text-right">
+                          ${item.totalAmount.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <h2 className="font-bold mb-2">Service Times</h2>
+                <p>
+                  <LeftSquareTwoTone twoToneColor="#52c41a" /> In:{" "}
+                  {dayjs(selectedCarService.carInDateTime).format(
+                    "DD-MM-YYYY HH:mm"
+                  )}
+                </p>
+                {selectedCarService.carOutDateTime && (
+                  <p>
+                    <RightSquareTwoTone twoToneColor="#ff4d4f" /> Out:{" "}
+                    {dayjs(selectedCarService.carOutDateTime).format(
+                      "DD-MM-YYYY HH:mm"
+                    )}
+                  </p>
+                )}
+              </div>
+              <div className="text-right">
+                <div className="mb-2">
+                  <span className="font-bold">Subtotal:</span> $
+                  {selectedCarService.totalAmount.toFixed(2)}
+                </div>
+                {selectedCarService.discountType &&
+                  selectedCarService.discountAmount && (
+                    <div className="mb-2">
+                      <span className="font-bold">Discount:</span> $
+                      {selectedCarService.discountAmount.toFixed(2)}
+                      {selectedCarService.discountType === "PERCENTAGE" &&
+                        " (%)"}
+                    </div>
+                  )}
+
+                <div className="text-xl font-bold">
+                  <span>Total:</span> $
+                  {selectedCarService.finalAmount.toFixed(2)}
+                </div>
+                <div className="mb-2">
+                  <span className="font-bold">GST:</span> $
+                  {selectedCarService.gstAmount?.toFixed(2)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
