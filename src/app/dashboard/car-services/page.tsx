@@ -766,7 +766,9 @@ export default function CarServicesPage() {
             </div>
             <div className="text-center mb-8">
               <h2 className="text-xl font-bold">Tax Invoice</h2>
-              <p className="text-gray-600">Invoice #{selectedCarService.id}</p>
+              <p className="text-gray-600">
+                Invoice #{selectedCarService.id.slice(-6).toUpperCase()}
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-8 mb-8">
