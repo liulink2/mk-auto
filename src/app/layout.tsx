@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MK Auto",
-  description: "MK Auto Management System",
+  title: "MK Autoteck Centre",
+  description: "MK Autoteck Centre Management System",
 };
 
 export default function RootLayout({

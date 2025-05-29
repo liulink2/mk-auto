@@ -85,7 +85,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         }}
       >
         <div className="p-4 text-center">
-          <h1 className="text-xl font-bold">MK Auto</h1>
+          <h1 className="text-xl font-bold">MK Autoteck</h1>
         </div>
         <Menu
           mode="inline"
