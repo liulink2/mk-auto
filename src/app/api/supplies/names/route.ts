@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
       select: {
         name: true,
       },
+      take: 10,
     });
 
     return NextResponse.json(supplies);

@@ -17,6 +17,7 @@ import {
   Divider,
   Typography,
   App,
+  Upload,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -26,6 +27,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   MinusCircleOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -90,6 +92,7 @@ export default function SupplyManagementPage() {
   const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
+  const [uploading, setUploading] = useState(false);
 
   const fetchSupplies = useCallback(
     async (selectedDate: Dayjs) => {
@@ -218,8 +221,8 @@ export default function SupplyManagementPage() {
         totalGstAmount += item.gstAmount;
       });
       addForm.setFieldsValue({
-        totalAmount,
-        totalGstAmount,
+        totalAmount: Math.round(totalAmount * 100) / 100,
+        totalGstAmount: Math.round(totalGstAmount * 100) / 100,
         items: allValues.items,
       });
     }
@@ -281,6 +284,104 @@ export default function SupplyManagementPage() {
     );
     setSelectedInvoiceItems(invoiceItems);
     setIsInvoiceDetailsModalVisible(true);
+  };
+
+  const compressImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions while maintaining aspect ratio
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round((width * MAX_HEIGHT) / height);
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Failed to get canvas context"));
+            return;
+          }
+
+          // Draw image with white background
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to base64 with reduced quality
+          const base64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+          resolve(base64);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const handleUpload = async (file: File) => {
+    try {
+      setUploading(true);
+
+      // Compress image and convert to base64
+      const imageBase64 = await compressImage(file);
+
+      const response = await fetch("/api/supplies/extract-invoice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageBase64 }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to extract invoice data");
+      }
+
+      const { data } = await response.json();
+
+      // Set form values based on extracted data
+      addForm.setFieldsValue({
+        invoiceNumber: data.invoiceNumber,
+        supplierId: data.supplierId,
+        suppliedDate: data.suppliedDate ? dayjs(data.suppliedDate) : undefined,
+        paymentType: data.paymentType || "CARD",
+        items: data.items.map((item: any) => ({
+          name: item.name,
+          description: item.description || "",
+          quantity: Number(item.quantity) || 1,
+          price: Number(item.price) || 0,
+          gstAmount: Number(item.gstAmount) || 0,
+          totalAmount: Number(item.totalAmount) || 0,
+        })),
+      });
+
+      message.success("Invoice data extracted successfully");
+    } catch (error) {
+      message.error("Failed to extract invoice data");
+    } finally {
+      setUploading(false);
+    }
+    return false; // Prevent default upload behavior
   };
 
   const columns: ColumnsType<Supply> = [
@@ -467,6 +568,18 @@ export default function SupplyManagementPage() {
             items: [{ name: "", description: "", quantity: 1, price: 0 }],
           }}
         >
+          <div className="mb-4">
+            <Upload
+              accept="image/*"
+              beforeUpload={handleUpload}
+              showUploadList={false}
+            >
+              <Button icon={<UploadOutlined />} loading={uploading}>
+                [AI] Upload Invoice for auto filling
+              </Button>{" "}
+            </Upload>
+          </div>
+
           <div className="grid grid-cols-12 gap-4">
             <Form.Item
               name="suppliedDate"
@@ -541,7 +654,7 @@ export default function SupplyManagementPage() {
                       <Form.Item
                         {...restField}
                         name={[name, "quantity"]}
-                        label="Quantity"
+                        label="Qty"
                         rules={[
                           { required: true, message: "Please input quantity!" },
                         ]}
