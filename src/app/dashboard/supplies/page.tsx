@@ -357,7 +357,7 @@ export default function SupplyManagementPage() {
         throw new Error("Failed to extract invoice data");
       }
 
-      const { data } = await response.json();
+      const { data }: { data: SupplyFormValues } = await response.json();
 
       // Set form values based on extracted data
       addForm.setFieldsValue({
@@ -365,7 +365,7 @@ export default function SupplyManagementPage() {
         supplierId: data.supplierId,
         suppliedDate: data.suppliedDate ? dayjs(data.suppliedDate) : undefined,
         paymentType: data.paymentType || "CARD",
-        items: data.items.map((item: any) => ({
+        items: data.items.map((item) => ({
           name: item.name,
           description: item.description || "",
           quantity: Number(item.quantity) || 1,
@@ -376,7 +376,7 @@ export default function SupplyManagementPage() {
       });
 
       message.success("Invoice data extracted successfully");
-    } catch (error) {
+    } catch {
       message.error("Failed to extract invoice data");
     } finally {
       setUploading(false);
