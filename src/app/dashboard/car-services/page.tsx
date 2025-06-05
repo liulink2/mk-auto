@@ -2,19 +2,13 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  Table,
   Button,
   Modal,
   Form,
-  Input,
   DatePicker,
-  InputNumber,
   Space,
-  Card,
-  Select,
   Tag,
   Popconfirm,
-  AutoComplete,
   App,
   Popover,
 } from "antd";
@@ -22,8 +16,6 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  MinusCircleOutlined,
-  CheckOutlined,
   PhoneOutlined,
   InfoCircleOutlined,
   UserOutlined,
@@ -33,41 +25,16 @@ import {
   LeftSquareTwoTone,
   RightSquareTwoTone,
   FileTextOutlined,
-  PrinterOutlined,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
 import { Supply } from "@prisma/client";
 import { useCompanySettings } from "@/contexts/CompanySettingsContext";
-
-interface CarServiceItem {
-  id: string;
-  serviceType: string;
-  name: string;
-  price: number;
-  quantity: number;
-  totalAmount: number;
-}
-
-interface CarService {
-  id: string;
-  carPlate: string;
-  carDetails: string;
-  ownerName: string;
-  phoneNo: string;
-  carInDateTime: string;
-  carOutDateTime?: string;
-  totalAmount: number;
-  gstAmount?: number;
-  paidInCash?: number;
-  paidInCard?: number;
-  year: number;
-  month: number;
-  carServiceItems: CarServiceItem[];
-  discountType?: "PERCENTAGE" | "FIXED";
-  discountAmount?: number;
-  finalAmount: number;
-}
+import { CarService } from "./types";
+import CarServiceForm from "./components/CarServiceForm";
+import CarServiceTable from "./components/CarServiceTable";
+import CarServiceInvoiceModal from "./components/CarServiceInvoiceModal";
+import SummaryCards from "./components/SummaryCards";
 
 export default function CarServicesPage() {
   const { message } = App.useApp();
@@ -493,28 +460,21 @@ export default function CarServicesPage() {
         </Space>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <Card title="Total Services">{summary.totalServices}</Card>
-        <Card title="Total Amount">${summary.finalAmount.toFixed(2)}</Card>
-        <Card title="Paid in Cash">${summary.totalCash.toFixed(2)}</Card>
-        <Card title="Paid in Card">${summary.totalCard.toFixed(2)}</Card>
-      </div>
+      <SummaryCards summary={summary} />
 
       <h2 className="text-xl font-bold mt-4">Active Car Service</h2>
-      <Table
+      <CarServiceTable
         dataSource={activeCarServices}
         columns={columns}
         rowKey="id"
-        pagination={false}
         loading={loading}
       />
 
       <h2 className="text-xl font-bold mt-4">Completed Car Service</h2>
-      <Table
+      <CarServiceTable
         dataSource={completedCarServices}
         columns={columns}
         rowKey="id"
-        pagination={false}
         loading={loading}
       />
 
@@ -525,351 +485,27 @@ export default function CarServicesPage() {
         confirmLoading={loading}
         onCancel={() => setIsModalVisible(false)}
         width={1200}
+        footer={null}
       >
-        <Form<CarService>
+        <CarServiceForm
           form={form}
-          onValuesChange={handleValuesChange}
-          layout="vertical"
-          className="mt-4"
-        >
-          <div className="grid grid-cols-3 gap-4">
-            <Form.Item
-              name="carPlate"
-              label="Car Plate"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="ownerName"
-              label="Owner Name"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="phoneNo"
-              label="Phone No"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="carInDateTime"
-              label="Car In Date Time"
-              rules={[{ required: true }]}
-            >
-              <DatePicker showTime format="DD-MM-YYYY HH:mm" />
-            </Form.Item>
-
-            <Form.Item name="carOutDateTime" label="Car Out Date Time">
-              <DatePicker showTime format="DD-MM-YYYY HH:mm" />
-            </Form.Item>
-
-            <Form.Item
-              name="carDetails"
-              label="Car Details"
-              className="col-span-3"
-            >
-              <Input />
-            </Form.Item>
-          </div>
-
-          <div className="mt-4 mb-4">
-            <h2 className="text-lg font-bold">Service Items</h2>
-            <Form.List name="carServiceItems">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <div key={key} className="grid grid-cols-12 gap-4">
-                      <Form.Item
-                        {...restField}
-                        name={[name, "serviceType"]}
-                        rules={[
-                          { required: true, message: "Missing service type" },
-                        ]}
-                        className="col-span-2"
-                      >
-                        <Select placeholder="Select type">
-                          <Select.Option value="SERVICE">Service</Select.Option>
-                          <Select.Option value="PARTS">Parts</Select.Option>
-                        </Select>
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, "name"]}
-                        rules={[{ required: true, message: "Missing name" }]}
-                        className="col-span-6"
-                      >
-                        {form.getFieldValue([
-                          "carServiceItems",
-                          name,
-                          "serviceType",
-                        ]) === "PARTS" ? (
-                          <AutoComplete
-                            options={supplyNames.map((name) => ({
-                              value: name,
-                            }))}
-                            placeholder="Name"
-                            onSearch={debouncedFetchSupplyNames}
-                          />
-                        ) : (
-                          <Input placeholder="Name" />
-                        )}
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, "price"]}
-                        rules={[{ required: true, message: "Missing price" }]}
-                        className="col-span-1"
-                      >
-                        <InputNumber placeholder="Price" prefix="$" />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, "quantity"]}
-                        rules={[
-                          { required: true, message: "Missing quantity" },
-                        ]}
-                        className="col-span-1"
-                      >
-                        <InputNumber placeholder="Quantity" />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, "totalAmount"]}
-                        rules={[
-                          { required: true, message: "Missing total amount" },
-                        ]}
-                        className="col-span-1"
-                      >
-                        <InputNumber placeholder="Total" prefix="$" disabled />
-                      </Form.Item>
-                      <Button
-                        type="text"
-                        danger
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => remove(name)}
-                        className="col-span-1"
-                      />
-                    </div>
-                  ))}
-                  <Button
-                    type="dashed"
-                    onClick={() =>
-                      add({
-                        serviceType: "SERVICE",
-                        name: "",
-                        price: 0,
-                        quantity: 1,
-                        totalAmount: 0,
-                      })
-                    }
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Add Service Item
-                  </Button>
-                </>
-              )}
-            </Form.List>
-          </div>
-          <div className="flex justify-end">
-            <Form.Item name="totalAmount" label="Total Amount">
-              <InputNumber style={{ width: "100%" }} prefix="$" disabled />
-            </Form.Item>
-          </div>
-          <div className="flex justify-end gap-4">
-            <Form.Item name="discountType" label="Discount Type">
-              <Select>
-                <Select.Option value="PERCENTAGE">Percentage</Select.Option>
-                <Select.Option value="FIXED">Fixed</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="discountAmount" label="Discount Value">
-              <InputNumber style={{ width: "100%" }} />
-            </Form.Item>
-            <Form.Item name="finalAmount" label="Final Amount">
-              <InputNumber style={{ width: "100%" }} prefix="$" disabled />
-            </Form.Item>
-          </div>
-          <div className="flex justify-end gap-4">
-            <Form.Item name="gstAmount" label="GST Amount">
-              <InputNumber style={{ width: "100%" }} prefix="$" disabled />
-            </Form.Item>
-          </div>
-
-          <div className="flex gap-4 justify-end items-center">
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={() => {
-                form.setFieldsValue({
-                  paidInCash: form.getFieldValue("finalAmount"),
-                });
-              }}
-            />
-            <Form.Item name="paidInCash" label="Paid in Cash">
-              <InputNumber style={{ width: "100%" }} prefix="$" />
-            </Form.Item>
-          </div>
-          <div className="flex gap-4 justify-end items-center">
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={() => {
-                form.setFieldsValue({
-                  paidInCard: form.getFieldValue("finalAmount"),
-                });
-              }}
-            />
-            <Form.Item name="paidInCard" label="Paid in Card">
-              <InputNumber style={{ width: "100%" }} prefix="$" />
-            </Form.Item>
-          </div>
-        </Form>
+          editingCarService={editingCarService}
+          supplyNames={supplyNames}
+          debouncedFetchSupplyNames={debouncedFetchSupplyNames}
+          handleValuesChange={handleValuesChange}
+          loading={loading}
+          onSubmit={handleSubmit}
+          setIsModalVisible={setIsModalVisible}
+        />
       </Modal>
 
-      <Modal
-        open={isInvoiceModalVisible}
-        onCancel={() => setIsInvoiceModalVisible(false)}
-        footer={[
-          <Button
-            key="print"
-            type="primary"
-            icon={<PrinterOutlined />}
-            onClick={handlePrint}
-          >
-            Print Invoice
-          </Button>,
-        ]}
-        width={800}
-      >
-        {selectedCarService && (
-          <div id="invoice-content" className="p-6">
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold">
-                {companySettings.companyName}
-              </h1>
-              <div className="company-info">
-                <p>{companySettings.address}</p>
-                <p>Phone: {companySettings.phoneNumber}</p>
-                <p>Email: {companySettings.email}</p>
-                {companySettings.abn && <p>ABN: {companySettings.abn}</p>}
-                {companySettings.website && (
-                  <p>Website: {companySettings.website}</p>
-                )}
-              </div>
-            </div>
-            <div className="text-center mb-8">
-              <h2 className="text-xl font-bold">Tax Invoice</h2>
-              <p className="text-gray-600">
-                Invoice #{selectedCarService.id.slice(-6).toUpperCase()}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              <div>
-                <h2 className="font-bold mb-2">Customer Information</h2>
-                <p>
-                  <UserOutlined /> {selectedCarService.ownerName}
-                </p>
-                <p>
-                  <PhoneOutlined /> {selectedCarService.phoneNo}
-                </p>
-              </div>
-              <div>
-                <h2 className="font-bold mb-2">Vehicle Information</h2>
-                <p>
-                  <CarOutlined /> {selectedCarService.carPlate.toUpperCase()}
-                </p>
-                {selectedCarService.carDetails && (
-                  <p>{selectedCarService.carDetails}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h2 className="font-bold mb-2">Service Details</h2>
-              <div className="border rounded-lg">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="p-2 text-left">Service/Part</th>
-                      <th className="p-2 text-right">Price</th>
-                      <th className="p-2 text-right">Quantity</th>
-                      <th className="p-2 text-right">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedCarService.carServiceItems.map((item, index) => (
-                      <tr
-                        key={item.id}
-                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                      >
-                        <td className="p-2">{item.name}</td>
-                        <td className="p-2 text-right">
-                          ${item.price.toFixed(2)}
-                        </td>
-                        <td className="p-2 text-right">{item.quantity}</td>
-                        <td className="p-2 text-right">
-                          ${item.totalAmount.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <h2 className="font-bold mb-2">Service Date</h2>
-                <p>
-                  {dayjs(selectedCarService.carInDateTime).format(
-                    "DD-MM-YYYY HH:mm"
-                  )}
-                </p>
-              </div>
-              <div className="text-right">
-                <div className="mb-2">
-                  <span className="font-bold">Subtotal:</span> $
-                  {selectedCarService.totalAmount.toFixed(2)}
-                </div>
-                {selectedCarService.discountType &&
-                  selectedCarService.discountAmount && (
-                    <div className="mb-2">
-                      <span className="font-bold">Discount:</span> $
-                      {selectedCarService.discountAmount.toFixed(2)}
-                      {selectedCarService.discountType === "PERCENTAGE" &&
-                        " (%)"}
-                    </div>
-                  )}
-
-                <div className="text-xl font-bold">
-                  <span>Total incl. GST:</span> $
-                  {selectedCarService.finalAmount.toFixed(2)}
-                </div>
-                <div className="mb-2">
-                  <span className="font-bold">GST amount:</span> $
-                  {selectedCarService.gstAmount?.toFixed(2)}
-                </div>
-              </div>
-            </div>
-            <hr />
-            <div>
-              <div>Price includes GST</div>
-              <div>
-                All goods remain in the property of the vendor until the invoice
-                is paid in full.
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
+      <CarServiceInvoiceModal
+        isInvoiceModalVisible={isInvoiceModalVisible}
+        setIsInvoiceModalVisible={setIsInvoiceModalVisible}
+        handlePrint={handlePrint}
+        selectedCarService={selectedCarService}
+        companySettings={companySettings}
+      />
     </div>
   );
 }
