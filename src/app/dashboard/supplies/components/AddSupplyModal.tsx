@@ -10,7 +10,7 @@ import {
   Space,
   Divider,
   Upload,
-  Typography,
+  FormInstance,
 } from "antd";
 import {
   PlusOutlined,
@@ -18,9 +18,6 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import { Supplier, SupplyFormValues } from "../types";
-import dayjs from "dayjs";
-
-const { Text } = Typography;
 
 interface AddSupplyModalProps {
   visible: boolean;
@@ -30,7 +27,7 @@ interface AddSupplyModalProps {
   loading: boolean;
   uploading: boolean;
   handleUpload: (file: File) => Promise<boolean | void>;
-  addForm: any;
+  addForm: FormInstance<SupplyFormValues>;
   handleValuesChange: (
     _: Partial<SupplyFormValues>,
     allValues: SupplyFormValues

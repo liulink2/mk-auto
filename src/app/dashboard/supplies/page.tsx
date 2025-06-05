@@ -13,7 +13,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { PlusOutlined } from "@ant-design/icons";
-import { Supply, Supplier, SupplyFormValues } from "./types";
+import { Supply, SupplyFormValues } from "./types";
 import { useSupplies } from "./hooks/useSupplies";
 import { useSuppliers } from "./hooks/useSuppliers";
 import { compressImage } from "./utils/imageUtils";
@@ -41,14 +41,14 @@ export default function SupplyManagementPage() {
   const [uploading, setUploading] = useState(false);
 
   // Custom hooks
-  const { date, setDate, supplies, setSupplies, loading, fetchSupplies } =
+  const { date, setDate, supplies, loading, fetchSupplies } =
     useSupplies(message);
   const { suppliers, fetchSuppliers } = useSuppliers(message);
 
   useEffect(() => {
     fetchSupplies(date);
     fetchSuppliers();
-  }, [date, fetchSuppliers, fetchSupplies]);
+  }, [date, fetchSupplies, fetchSuppliers]);
 
   const showAddModal = () => {
     addForm.setFieldsValue({

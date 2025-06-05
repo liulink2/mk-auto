@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export interface SupplyItem {
   name: string;
   description?: string;
@@ -35,7 +37,7 @@ export interface Supply {
 export interface SupplyFormValues {
   invoiceNumber: string;
   supplierId: string;
-  suppliedDate: any; // Use Dayjs in the main file
+  suppliedDate: Dayjs;
   paymentType: "CASH" | "CARD";
   remarks?: string;
   items: SupplyItem[];

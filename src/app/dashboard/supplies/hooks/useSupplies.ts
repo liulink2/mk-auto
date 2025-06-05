@@ -1,8 +1,9 @@
 import { useState, useCallback } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { Supply } from "../types";
+import { MessageInstance } from "antd/es/message/interface";
 
-export function useSupplies(message: any) {
+export function useSupplies(message: MessageInstance) {
   const [date, setDate] = useState<Dayjs>(dayjs());
   const [supplies, setSupplies] = useState<Supply[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,8 @@
 import { useState, useCallback } from "react";
 import { Supplier } from "../types";
+import { MessageInstance } from "antd/es/message/interface";
 
-export function useSuppliers(message: any) {
+export function useSuppliers(message: MessageInstance) {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
   const fetchSuppliers = useCallback(async () => {

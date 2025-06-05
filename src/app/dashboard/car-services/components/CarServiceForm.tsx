@@ -6,6 +6,7 @@ import {
   AutoComplete,
   InputNumber,
   Button,
+  FormInstance,
 } from "antd";
 import {
   PlusOutlined,
@@ -16,25 +17,17 @@ import React from "react";
 import { CarService } from "../types";
 
 interface CarServiceFormProps {
-  form: any;
-  editingCarService: CarService | null;
+  form: FormInstance<CarService>;
   supplyNames: string[];
   debouncedFetchSupplyNames: (searchText: string) => void;
   handleValuesChange: (_: Partial<CarService>, values: CarService) => void;
-  loading: boolean;
-  onSubmit: () => void;
-  setIsModalVisible: (visible: boolean) => void;
 }
 
 const CarServiceForm: React.FC<CarServiceFormProps> = ({
   form,
-  editingCarService,
   supplyNames,
   debouncedFetchSupplyNames,
   handleValuesChange,
-  loading,
-  onSubmit,
-  setIsModalVisible,
 }) => {
   return (
     <Form<CarService>

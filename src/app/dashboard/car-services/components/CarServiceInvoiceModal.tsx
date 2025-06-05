@@ -8,12 +8,13 @@ import {
 import dayjs from "dayjs";
 import React from "react";
 import { CarService } from "../types";
+import { CompanySettings } from "@/contexts/CompanySettingsContext";
 
 interface CarServiceInvoiceModalProps {
   isInvoiceModalVisible: boolean;
   setIsInvoiceModalVisible: (visible: boolean) => void;
   selectedCarService: CarService | null;
-  companySettings: any;
+  companySettings: CompanySettings;
   handlePrint: () => void;
 }
 

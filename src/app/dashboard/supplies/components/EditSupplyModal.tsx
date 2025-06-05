@@ -8,6 +8,7 @@ import {
   DatePicker,
   Button,
   Space,
+  FormInstance,
 } from "antd";
 import { Supplier, Supply } from "../types";
 
@@ -17,7 +18,7 @@ interface EditSupplyModalProps {
   onSubmit: (values: Supply) => void;
   suppliers: Supplier[];
   loading: boolean;
-  editForm: any;
+  editForm: FormInstance<Supply>;
   handleEditValuesChange: (
     changedValues: Partial<Supply>,
     allValues: Supply

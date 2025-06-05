@@ -489,13 +489,9 @@ export default function CarServicesPage() {
       >
         <CarServiceForm
           form={form}
-          editingCarService={editingCarService}
           supplyNames={supplyNames}
           debouncedFetchSupplyNames={debouncedFetchSupplyNames}
           handleValuesChange={handleValuesChange}
-          loading={loading}
-          onSubmit={handleSubmit}
-          setIsModalVisible={setIsModalVisible}
         />
       </Modal>
 

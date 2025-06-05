@@ -1,11 +1,12 @@
 import { Table } from "antd";
 import React from "react";
+import { CarService } from "../types";
+import { ColumnsType } from "antd/es/table";
 
 interface CarServiceTableProps {
-  dataSource: any[];
-  columns: any[];
+  dataSource: CarService[];
+  columns: ColumnsType<CarService>;
   rowKey: string;
-  pagination?: boolean;
   loading: boolean;
 }
 
@@ -13,7 +14,6 @@ const CarServiceTable: React.FC<CarServiceTableProps> = ({
   dataSource,
   columns,
   rowKey,
-  pagination,
   loading,
 }) => {
   return (
@@ -21,7 +21,7 @@ const CarServiceTable: React.FC<CarServiceTableProps> = ({
       dataSource={dataSource}
       columns={columns}
       rowKey={rowKey}
-      pagination={pagination ? undefined : false}
+      pagination={false}
       loading={loading}
     />
   );

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from "react";
 
-interface CompanySettings {
+export interface CompanySettings {
   companyName: string;
   address: string;
   phoneNumber: string;
