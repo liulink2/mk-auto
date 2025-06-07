@@ -57,6 +57,14 @@ const CarServiceForm: React.FC<CarServiceFormProps> = ({
           <Input />
         </Form.Item>
 
+        <Form.Item name="carDetails" label="Car Details" className="col-span-2">
+          <Input />
+        </Form.Item>
+
+        <Form.Item name="odo" label="Odometer">
+          <InputNumber style={{ width: "100%" }} />
+        </Form.Item>
+
         <Form.Item
           name="carInDateTime"
           label="Car In Date Time"
@@ -69,8 +77,15 @@ const CarServiceForm: React.FC<CarServiceFormProps> = ({
           <DatePicker showTime format="DD-MM-YYYY HH:mm" />
         </Form.Item>
 
-        <Form.Item name="carDetails" label="Car Details" className="col-span-3">
-          <Input />
+        <Form.Item
+          name="isInvoiceIssued"
+          label="Invoice Issued"
+          valuePropName="checked"
+        >
+          <Select>
+            <Select.Option value={true}>Yes</Select.Option>
+            <Select.Option value={false}>No</Select.Option>
+          </Select>
         </Form.Item>
       </div>
 

@@ -25,4 +25,6 @@ export interface CarService {
   discountType?: "PERCENTAGE" | "FIXED";
   discountAmount?: number;
   finalAmount: number;
+  odo: number;
+  isInvoiceIssued: boolean;
 }

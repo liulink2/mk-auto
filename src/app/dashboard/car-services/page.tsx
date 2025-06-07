@@ -102,6 +102,8 @@ export default function CarServicesPage() {
       finalAmount: 0,
       paidInCash: 0,
       paidInCard: 0,
+      odo: 0,
+      isInvoiceIssued: false,
       carServiceItems: [
         {
           serviceType: "SERVICE",
@@ -485,7 +487,19 @@ export default function CarServicesPage() {
         confirmLoading={loading}
         onCancel={() => setIsModalVisible(false)}
         width={1200}
-        footer={null}
+        footer={[
+          <Button key="cancel" danger onClick={() => setIsModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleSubmit}
+            loading={loading}
+          >
+            {editingCarService ? "Update" : "Create"}
+          </Button>,
+        ]}
       >
         <CarServiceForm
           form={form}

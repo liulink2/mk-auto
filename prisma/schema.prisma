@@ -165,6 +165,8 @@ model CarService {
   paidInCard    Float?
   year          Int
   month         Int
+  odo           Int?
+  isInvoiceIssued Boolean       @default(false)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
