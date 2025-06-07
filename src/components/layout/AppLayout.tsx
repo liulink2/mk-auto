@@ -9,6 +9,7 @@ import {
   ShoppingCartOutlined,
   DollarOutlined,
   CarOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -61,6 +62,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
       icon: <CarOutlined />,
       label: "Car Services",
       onClick: () => router.push("/dashboard/car-services"),
+    },
+    {
+      key: "service-extra-info",
+      icon: <InfoCircleOutlined />,
+      label: "Service Extra Info",
+      onClick: () => router.push("/dashboard/service-extra-info"),
     },
   ];
 

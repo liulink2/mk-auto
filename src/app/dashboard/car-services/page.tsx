@@ -262,6 +262,7 @@ export default function CarServicesPage() {
                 .border-t { border-top: 1px solid #ddd; }
                 .company-info { margin-bottom: 2rem; }
                 .company-info p { margin: 0.25rem 0; }
+                .whitespace-pre-line { white-space: pre-line; }
                 @media print {
                   body { 
                     margin: 0;

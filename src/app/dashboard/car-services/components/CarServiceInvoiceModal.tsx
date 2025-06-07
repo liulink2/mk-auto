@@ -6,9 +6,11 @@ import {
   CarOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import React from "react";
-import { CarService } from "../types";
+import React, { useMemo } from "react";
+import { CarService, CarServiceItem } from "../types";
 import { CompanySettings } from "@/contexts/CompanySettingsContext";
+import { useServiceExtraInfo } from "@/lib/service-extra-info";
+import { ServiceType } from "@prisma/client";
 
 interface CarServiceInvoiceModalProps {
   isInvoiceModalVisible: boolean;
@@ -25,8 +27,20 @@ const CarServiceInvoiceModal: React.FC<CarServiceInvoiceModalProps> = ({
   companySettings,
   handlePrint,
 }) => {
+  // Memoize the service items array to prevent unnecessary re-renders
+  const serviceItems = useMemo(() => {
+    if (!selectedCarService) return [];
+    return selectedCarService.carServiceItems.map((item: CarServiceItem) => ({
+      name: item.name,
+      serviceType: item.serviceType as ServiceType,
+    }));
+  }, [selectedCarService]);
+
+  const { extraInfoMap, loading } = useServiceExtraInfo(serviceItems);
+
   return (
     <Modal
+      loading={loading}
       open={isInvoiceModalVisible}
       onCancel={() => setIsInvoiceModalVisible(false)}
       footer={[
@@ -98,21 +112,42 @@ const CarServiceInvoiceModal: React.FC<CarServiceInvoiceModalProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedCarService.carServiceItems.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                    >
-                      <td className="p-2">{item.name}</td>
-                      <td className="p-2 text-right">
-                        ${item.price.toFixed(2)}
-                      </td>
-                      <td className="p-2 text-right">{item.quantity}</td>
-                      <td className="p-2 text-right">
-                        ${item.totalAmount.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
+                  {selectedCarService.carServiceItems.map(
+                    (item: CarServiceItem, index: number) => (
+                      <React.Fragment key={item.id}>
+                        <tr
+                          className={
+                            index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          }
+                        >
+                          <td className="p-2">{item.name}</td>
+                          <td className="p-2 text-right">
+                            ${item.price.toFixed(2)}
+                          </td>
+                          <td className="p-2 text-right">{item.quantity}</td>
+                          <td className="p-2 text-right">
+                            ${item.totalAmount.toFixed(2)}
+                          </td>
+                        </tr>
+                        {extraInfoMap.get(item.name) && (
+                          <tr
+                            className={
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                            }
+                          >
+                            <td
+                              colSpan={4}
+                              className="p-2 text-sm text-gray-600 italic"
+                            >
+                              <div className="whitespace-pre-line">
+                                {extraInfoMap.get(item.name)}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>
@@ -120,7 +155,7 @@ const CarServiceInvoiceModal: React.FC<CarServiceInvoiceModalProps> = ({
 
           <div className="grid grid-cols-2 gap-8">
             <div>
-              <h2 className="font-bold mb-2">Service Date</h2>
+              <span className="font-bold mb-2">Service Date</span>
               <p>
                 {dayjs(selectedCarService.carInDateTime).format(
                   "DD-MM-YYYY HH:mm"

@@ -148,6 +148,15 @@ model CarServiceItem {
   updatedAt     DateTime    @updatedAt
 }
 
+model ServiceExtraInfo {
+  id              String      @id @default(cuid())
+  serviceType     ServiceType
+  serviceNames    String[]    // Array of service names to match against
+  extraInfo       String      @db.Text
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
 model CarService {
   id            String          @id @default(cuid())
   carPlate      String
