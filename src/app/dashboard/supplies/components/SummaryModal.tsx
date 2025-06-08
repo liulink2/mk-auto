@@ -93,8 +93,8 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
                 key={supplier}
                 className="flex justify-between items-center pl-4 text-sm"
               >
-                <Text type="secondary">{supplier}</Text>
-                <Text type="secondary">
+                <Text>{supplier}</Text>
+                <Text>
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: "USD",

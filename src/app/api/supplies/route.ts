@@ -6,21 +6,23 @@ type Params = Promise<{ id: string }>;
 // GET /api/supplies
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const month = searchParams.get("month");
     const year = searchParams.get("year");
+    const includeSettled = searchParams.get("includeSettled") === "true";
+
+    const where = {
+      ...(month && year
+        ? {
+            month: parseInt(month),
+            year: parseInt(year),
+          }
+        : {}),
+      ...(includeSettled ? {} : { settled: false }),
+    };
 
     const supplies = await prisma.supply.findMany({
-      where: {
-        AND: [
-          month && year
-            ? {
-                month: parseInt(month),
-                year: parseInt(year),
-              }
-            : {},
-        ],
-      },
+      where,
       include: {
         supplier: {
           include: {
@@ -32,9 +34,10 @@ export async function GET(request: NextRequest) {
         suppliedDate: "desc",
       },
     });
+
     return NextResponse.json(supplies);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching supplies:", error);
     return NextResponse.json(
       { error: "Failed to fetch supplies" },
       { status: 500 }

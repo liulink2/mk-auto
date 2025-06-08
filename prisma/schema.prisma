@@ -114,6 +114,8 @@ model Supply {
   suppliedDate  DateTime
   month         Int
   year          Int
+  mappedNames   String[]    @default([])
+  settled       Boolean     @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -144,6 +146,7 @@ model CarServiceItem {
   totalAmount   Float
   carServiceId  String
   carService    CarService  @relation(fields: [carServiceId], references: [id])
+  settled       Boolean     @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }

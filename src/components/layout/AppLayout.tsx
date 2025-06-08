@@ -11,6 +11,7 @@ import {
   CarOutlined,
   InfoCircleOutlined,
   HistoryOutlined,
+  InboxOutlined,
 } from "@ant-design/icons";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -51,6 +52,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
       icon: <ShoppingCartOutlined />,
       label: "Supplies",
       onClick: () => router.push("/dashboard/supplies"),
+    },
+    {
+      key: "inventory",
+      icon: <InboxOutlined />,
+      label: "Inventory",
+      onClick: () => router.push("/dashboard/inventory"),
     },
     {
       key: "expenses",

@@ -145,7 +145,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     className="col-span-1"
                   >
                     <InputNumber
-                      min={1}
+                      step={1}
                       style={{ width: "100%" }}
                       parser={(value: string | undefined) =>
                         value ? parseInt(value) : 0

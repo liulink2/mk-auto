@@ -104,7 +104,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           rules={[{ required: true, message: "Please enter quantity" }]}
           className="col-span-1"
         >
-          <InputNumber min={1} style={{ width: "100%" }} />
+          <InputNumber step={1} style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item
           name="price"
