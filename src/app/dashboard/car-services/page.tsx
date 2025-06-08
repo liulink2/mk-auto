@@ -389,7 +389,7 @@ export default function CarServicesPage() {
               (record.paidInCash ?? 0) -
               (record.paidInCard ?? 0) !==
               0 && <Tag color="red">Payment</Tag>}
-            {record.isInvoiceIssued && <Tag color="green">Invoice</Tag>}
+            {record.isInvoiceIssued && <Tag color="blue">Invoice</Tag>}
           </>
         );
       },
