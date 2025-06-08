@@ -10,6 +10,7 @@ import {
   DollarOutlined,
   CarOutlined,
   InfoCircleOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -62,6 +63,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
       icon: <CarOutlined />,
       label: "Car Services",
       onClick: () => router.push("/dashboard/car-services"),
+    },
+    {
+      key: "customer-history",
+      icon: <HistoryOutlined />,
+      label: "Customer History",
+      onClick: () => router.push("/dashboard/customer-history"),
     },
     {
       key: "service-extra-info",

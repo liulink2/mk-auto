@@ -25,6 +25,7 @@ import {
   LeftSquareTwoTone,
   RightSquareTwoTone,
   FileTextOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
@@ -313,6 +314,9 @@ export default function CarServicesPage() {
           </div>
           <div>
             <PhoneOutlined /> {record.phoneNo}
+          </div>
+          <div>
+            <DashboardOutlined /> {record.odo}
           </div>
         </>
       ),
