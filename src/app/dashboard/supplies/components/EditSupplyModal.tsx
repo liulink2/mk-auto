@@ -10,6 +10,7 @@ import {
   Space,
   FormInstance,
 } from "antd";
+import dayjs from "dayjs";
 import { Supplier, Supply } from "../types";
 
 interface EditSupplyModalProps {
@@ -48,7 +49,14 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
       layout="vertical"
       onFinish={onSubmit}
       onValuesChange={handleEditValuesChange}
-      initialValues={editingSupply ?? undefined}
+      initialValues={
+        editingSupply
+          ? {
+              ...editingSupply,
+              suppliedDate: dayjs(editingSupply.suppliedDate),
+            }
+          : undefined
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <Form.Item
