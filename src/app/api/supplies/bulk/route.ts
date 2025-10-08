@@ -18,7 +18,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log(supplies);
     // Create all supplies in a transaction
     const createdSupplies = await prisma.$transaction(
       supplies.map((supply: Supply) =>
