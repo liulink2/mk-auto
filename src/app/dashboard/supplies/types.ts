@@ -40,6 +40,8 @@ export interface SupplyFormValues {
   invoiceNumber: string;
   supplierId: string;
   suppliedDate: Dayjs;
+  month: number;
+  year: number;
   paymentType: "CASH" | "CARD";
   remarks?: string;
   items: SupplyItem[];

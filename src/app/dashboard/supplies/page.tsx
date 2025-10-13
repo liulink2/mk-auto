@@ -88,6 +88,8 @@ export default function SupplyManagementPage() {
         invoiceNumber: values.invoiceNumber,
         supplierId: values.supplierId,
         suppliedDate: values.suppliedDate.toISOString(),
+        month: values.suppliedDate.month() + 1,
+        year: values.suppliedDate.year(),
         paymentType: values.paymentType,
         remarks: values.remarks,
         name: item.name,
