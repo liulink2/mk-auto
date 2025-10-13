@@ -39,6 +39,7 @@ export default function SupplyManagementPage() {
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
   const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Custom hooks
   const { date, setDate, supplies, loading, fetchSupplies } =
@@ -83,6 +84,7 @@ export default function SupplyManagementPage() {
   };
 
   const handleSubmit = async (values: SupplyFormValues) => {
+    setSubmitting(true);
     try {
       const items = values.items.map((item) => ({
         invoiceNumber: values.invoiceNumber,
@@ -111,6 +113,8 @@ export default function SupplyManagementPage() {
       fetchSupplies(date);
     } catch {
       message.error("Failed to create supplies");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -154,6 +158,7 @@ export default function SupplyManagementPage() {
 
   const handleEditSubmit = async (value: Supply) => {
     if (!editingSupply) return;
+    setSubmitting(true);
     try {
       const response = await fetch(`/api/supplies/${editingSupply.id}`, {
         method: "PUT",
@@ -171,6 +176,8 @@ export default function SupplyManagementPage() {
       fetchSupplies(date);
     } catch {
       message.error("Failed to update supply");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -294,11 +301,7 @@ export default function SupplyManagementPage() {
         onCancel={handleAddCancel}
         onSubmit={handleSubmit}
         suppliers={suppliers}
-<<<<<<< Updated upstream
-        loading={loading}
-=======
         submitting={submitting}
->>>>>>> Stashed changes
         uploading={uploading}
         handleUpload={handleUpload}
         addForm={addForm}
@@ -309,11 +312,7 @@ export default function SupplyManagementPage() {
         onCancel={handleEditCancel}
         onSubmit={handleEditSubmit}
         suppliers={suppliers}
-<<<<<<< Updated upstream
-        loading={loading}
-=======
         submitting={submitting}
->>>>>>> Stashed changes
         editForm={editForm}
         handleEditValuesChange={handleEditValuesChange}
         editingSupply={editingSupply}

@@ -18,11 +18,7 @@ interface EditSupplyModalProps {
   onCancel: () => void;
   onSubmit: (values: Supply) => void;
   suppliers: Supplier[];
-<<<<<<< Updated upstream
-  loading: boolean;
-=======
   submitting: boolean;
->>>>>>> Stashed changes
   editForm: FormInstance<Supply>;
   handleEditValuesChange: (
     changedValues: Partial<Supply>,
@@ -36,11 +32,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
   onCancel,
   onSubmit,
   suppliers,
-<<<<<<< Updated upstream
-  loading,
-=======
   submitting,
->>>>>>> Stashed changes
   editForm,
   handleEditValuesChange,
   editingSupply,
@@ -158,7 +150,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           <Button danger onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button type="primary" htmlType="submit" loading={submitting}>
             Update
           </Button>
         </Space>
