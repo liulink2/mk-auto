@@ -88,6 +88,8 @@ export default function SupplyManagementPage() {
         invoiceNumber: values.invoiceNumber,
         supplierId: values.supplierId,
         suppliedDate: values.suppliedDate.toISOString(),
+        month: values.suppliedDate.month() + 1,
+        year: values.suppliedDate.year(),
         paymentType: values.paymentType,
         remarks: values.remarks,
         name: item.name,
@@ -150,13 +152,18 @@ export default function SupplyManagementPage() {
     }
   };
 
-  const handleEditSubmit = async (values: Supply) => {
+  const handleEditSubmit = async (value: Supply) => {
     if (!editingSupply) return;
     try {
       const response = await fetch(`/api/supplies/${editingSupply.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values }),
+        body: JSON.stringify({
+          ...value,
+          suppliedDate: value.suppliedDate.toISOString(),
+          month: value.suppliedDate.month() + 1,
+          year: value.suppliedDate.year(),
+        }),
       });
       if (!response.ok) throw new Error("Failed to update supply");
       message.success("Supply updated successfully");

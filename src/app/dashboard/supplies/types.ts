@@ -29,7 +29,7 @@ export interface Supply {
   gstAmount: number;
   paymentType: "CASH" | "CARD";
   remarks?: string;
-  suppliedDate: string;
+  suppliedDate: Dayjs;
   mappedNames: string[];
   settled: boolean;
   createdAt: string;
@@ -40,6 +40,8 @@ export interface SupplyFormValues {
   invoiceNumber: string;
   supplierId: string;
   suppliedDate: Dayjs;
+  month: number;
+  year: number;
   paymentType: "CASH" | "CARD";
   remarks?: string;
   items: SupplyItem[];

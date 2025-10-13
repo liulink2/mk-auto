@@ -25,9 +25,9 @@ export async function POST(request: Request) {
           data: {
             invoiceNumber: supply.invoiceNumber,
             supplierId: supply.supplierId,
-            suppliedDate: new Date(supply.suppliedDate),
-            month: new Date(supply.suppliedDate).getMonth() + 1,
-            year: new Date(supply.suppliedDate).getFullYear(),
+            suppliedDate: supply.suppliedDate,
+            month: supply.month,
+            year: supply.year,
             paymentType: supply.paymentType,
             remarks: supply.remarks,
             name: supply.name,
