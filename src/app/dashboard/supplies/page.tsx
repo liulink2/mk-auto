@@ -301,7 +301,6 @@ export default function SupplyManagementPage() {
         onCancel={handleAddCancel}
         onSubmit={handleSubmit}
         suppliers={suppliers}
-        loading={loading}
         submitting={submitting}
         uploading={uploading}
         handleUpload={handleUpload}
@@ -313,7 +312,6 @@ export default function SupplyManagementPage() {
         onCancel={handleEditCancel}
         onSubmit={handleEditSubmit}
         suppliers={suppliers}
-        loading={loading}
         submitting={submitting}
         editForm={editForm}
         handleEditValuesChange={handleEditValuesChange}

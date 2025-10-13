@@ -24,9 +24,8 @@ interface AddSupplyModalProps {
   onCancel: () => void;
   onSubmit: (values: SupplyFormValues) => void;
   suppliers: Supplier[];
-  loading: boolean;
-  submitting: boolean;
   uploading: boolean;
+  submitting: boolean;
   handleUpload: (file: File) => Promise<boolean | void>;
   addForm: FormInstance<SupplyFormValues>;
   handleValuesChange: (
@@ -40,7 +39,6 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
   onCancel,
   onSubmit,
   suppliers,
-  loading,
   submitting,
   uploading,
   handleUpload,

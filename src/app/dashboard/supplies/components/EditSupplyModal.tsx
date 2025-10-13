@@ -18,7 +18,6 @@ interface EditSupplyModalProps {
   onCancel: () => void;
   onSubmit: (values: Supply) => void;
   suppliers: Supplier[];
-  loading: boolean;
   submitting: boolean;
   editForm: FormInstance<Supply>;
   handleEditValuesChange: (
@@ -33,7 +32,6 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
   onCancel,
   onSubmit,
   suppliers,
-  loading,
   submitting,
   editForm,
   handleEditValuesChange,
