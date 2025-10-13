@@ -194,12 +194,12 @@ export default function ExpenseManagementPage() {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setEditingExpense(null);
     expenseForm.resetFields();
   };
 
   const handleSubmit = async (values: ExpenseFormValues) => {
     try {
-      console.log(values);
       const response = editingExpense
         ? await fetch(`/api/expenses/${editingExpense.id}`, {
             method: "PUT",
@@ -231,6 +231,7 @@ export default function ExpenseManagementPage() {
       );
 
       setIsModalVisible(false);
+      setEditingExpense(null);
       expenseForm.resetFields();
       fetchExpenses(date);
     } catch {
