@@ -294,7 +294,11 @@ export default function SupplyManagementPage() {
         onCancel={handleAddCancel}
         onSubmit={handleSubmit}
         suppliers={suppliers}
+<<<<<<< Updated upstream
         loading={loading}
+=======
+        submitting={submitting}
+>>>>>>> Stashed changes
         uploading={uploading}
         handleUpload={handleUpload}
         addForm={addForm}
@@ -305,7 +309,11 @@ export default function SupplyManagementPage() {
         onCancel={handleEditCancel}
         onSubmit={handleEditSubmit}
         suppliers={suppliers}
+<<<<<<< Updated upstream
         loading={loading}
+=======
+        submitting={submitting}
+>>>>>>> Stashed changes
         editForm={editForm}
         handleEditValuesChange={handleEditValuesChange}
         editingSupply={editingSupply}
