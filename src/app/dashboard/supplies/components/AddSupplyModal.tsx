@@ -51,7 +51,14 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
     onCancel={onCancel}
     footer={null}
     width="95%"
-    style={{ maxWidth: 1200 }}
+    styles={{
+      body: {
+        maxWidth: 1200,
+        maxHeight: "calc(100vh - 200px)",
+        overflowY: "auto",
+        WebkitOverflowScrolling: "touch", // Smooth scrolling on iOS
+      },
+    }}
   >
     <Form<SupplyFormValues>
       form={addForm}
@@ -123,7 +130,10 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
         {(fields, { add, remove }) => (
           <>
             {fields.map(({ key, name, ...restField }) => (
-              <div key={key} className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-0">
+              <div
+                key={key}
+                className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-0"
+              >
                 <div className="grid grid-cols-2 sm:grid-cols-12 gap-2 sm:gap-4 flex-1">
                   <Form.Item
                     {...restField}
