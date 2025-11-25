@@ -50,7 +50,8 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
     open={visible}
     onCancel={onCancel}
     footer={null}
-    width={1200}
+    width="95%"
+    style={{ maxWidth: 1200 }}
   >
     <Form<SupplyFormValues>
       form={addForm}
@@ -73,12 +74,12 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
           </Button>{" "}
         </Upload>
       </div>
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
         <Form.Item
           name="suppliedDate"
           label="Date"
           rules={[{ required: true, message: "Please select a date" }]}
-          className="col-span-2"
+          className="sm:col-span-2"
         >
           <DatePicker style={{ width: "100%" }} />
         </Form.Item>
@@ -86,7 +87,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
           name="invoiceNumber"
           label="Invoice Number"
           rules={[{ required: true, message: "Please enter invoice number" }]}
-          className="col-span-4"
+          className="sm:col-span-4"
         >
           <Input />
         </Form.Item>
@@ -94,7 +95,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
           name="supplierId"
           label="Supplier"
           rules={[{ required: true, message: "Please select a supplier" }]}
-          className="col-span-4"
+          className="sm:col-span-4"
         >
           <Select
             options={suppliers
@@ -109,7 +110,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
           name="paymentType"
           label="Payment"
           rules={[{ required: true, message: "Please select payment type" }]}
-          className="col-span-2"
+          className="sm:col-span-2"
         >
           <Select>
             <Select.Option value="CASH">Cash</Select.Option>
@@ -122,8 +123,8 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
         {(fields, { add, remove }) => (
           <>
             {fields.map(({ key, name, ...restField }) => (
-              <div key={key} className="flex">
-                <div className="grid grid-cols-12 gap-4 mb-1">
+              <div key={key} className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-0">
+                <div className="grid grid-cols-2 sm:grid-cols-12 gap-2 sm:gap-4 flex-1">
                   <Form.Item
                     {...restField}
                     name={[name, "name"]}
@@ -131,7 +132,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     rules={[
                       { required: true, message: "Please enter item name" },
                     ]}
-                    className="col-span-7"
+                    className="col-span-2 sm:col-span-7"
                   >
                     <Input />
                   </Form.Item>
@@ -142,7 +143,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     rules={[
                       { required: true, message: "Please input quantity!" },
                     ]}
-                    className="col-span-1"
+                    className="col-span-1 sm:col-span-1"
                   >
                     <InputNumber
                       step={1}
@@ -157,7 +158,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     name={[name, "price"]}
                     label="Price"
                     rules={[{ required: true, message: "Please input price!" }]}
-                    className="col-span-1"
+                    className="col-span-1 sm:col-span-1"
                   >
                     <InputNumber style={{ width: "100%" }} prefix="$" />
                   </Form.Item>
@@ -165,7 +166,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     {...restField}
                     name={[name, "gstAmount"]}
                     label="GST"
-                    className="col-span-1"
+                    className="col-span-1 sm:col-span-1"
                   >
                     <InputNumber style={{ width: "100%" }} prefix="$" />
                   </Form.Item>
@@ -173,19 +174,19 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     {...restField}
                     name={[name, "totalAmount"]}
                     label="Total"
-                    className="col-span-2"
+                    className="col-span-1 sm:col-span-2"
                   >
                     <InputNumber style={{ width: "100%" }} prefix="$" />
                   </Form.Item>
                 </div>
-                <div>
+                <div className="flex justify-end sm:block">
                   {fields.length > 1 && (
                     <Button
                       type="text"
                       danger
                       icon={<MinusCircleOutlined />}
                       onClick={() => remove(name)}
-                      className="mt-8 col-span-1"
+                      className="sm:mt-8"
                     />
                   )}
                 </div>
@@ -204,7 +205,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
           </>
         )}
       </Form.List>
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-end gap-4 mb-4">
         <div className="text-right text-xl">
           GST Amount:
           <div className="text-xl font-bold">
@@ -213,7 +214,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
             </Form.Item>
           </div>
         </div>
-        <div className="text-right text-xl ml-4">
+        <div className="text-right text-xl">
           Total Amount:
           <div className="text-xl font-bold">
             <Form.Item name="totalAmount" className="text-xl font-bold">

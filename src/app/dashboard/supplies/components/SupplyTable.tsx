@@ -134,12 +134,15 @@ export const SupplyTable: React.FC<SupplyTableProps> = ({
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={supplies}
-      loading={loading}
-      rowKey="id"
-      pagination={false}
-    />
+    <div className="overflow-x-auto">
+      <Table
+        columns={columns}
+        dataSource={supplies}
+        loading={loading}
+        rowKey="id"
+        pagination={false}
+        scroll={{ x: 'max-content' }}
+      />
+    </div>
   );
 };

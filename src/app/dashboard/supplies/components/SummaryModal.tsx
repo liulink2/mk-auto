@@ -20,14 +20,15 @@ export const SummaryModal: React.FC<SummaryModalProps> = ({
     open={visible}
     onCancel={onCancel}
     footer={null}
-    width={800}
+    width="95%"
+    style={{ maxWidth: 800 }}
   >
     <div className="space-y-6">
       <div>
         <Text strong className="text-lg block mb-4">
           Payment Type Summary
         </Text>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Object.entries(
             supplies.reduce((acc: { [key: string]: number }, supply) => {
               acc[supply.paymentType] =
