@@ -248,21 +248,21 @@ export default function SupplyManagementPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">Supply Management</h1>
-        <Space>
+        <Space className="flex flex-wrap">
           <DatePicker.MonthPicker
             value={date}
             onChange={(newDate) => newDate && setDate(newDate)}
-            style={{ width: 200 }}
+            className="w-full sm:w-[200px]"
           />
-          <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} className="w-full sm:w-auto">
             Add Supply
           </Button>
         </Space>
       </div>
       <Card className="mb-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Text type="secondary">Total Quantity</Text>
             <div className="text-2xl font-bold">

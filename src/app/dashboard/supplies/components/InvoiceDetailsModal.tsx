@@ -20,63 +20,67 @@ export const InvoiceDetailsModal: React.FC<InvoiceDetailsModalProps> = ({
     open={visible}
     onCancel={onCancel}
     footer={null}
-    width={1000}
+    width="95%"
+    style={{ maxWidth: 1000 }}
   >
-    <Table
-      columns={[
-        {
-          title: "Name",
-          dataIndex: "name",
-          key: "name",
-        },
-        {
-          title: "Description",
-          dataIndex: "description",
-          key: "description",
-        },
-        {
-          title: "Quantity",
-          dataIndex: "quantity",
-          key: "quantity",
-        },
-        {
-          title: "Price",
-          dataIndex: "price",
-          key: "price",
-          render: (price: number) => {
-            return new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(price);
+    <div className="overflow-x-auto">
+      <Table
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
           },
-        },
-        {
-          title: "GST",
-          dataIndex: "gstAmount",
-          key: "gstAmount",
-          render: (amount: number) => {
-            return new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(amount);
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
           },
-        },
-        {
-          title: "Total",
-          dataIndex: "totalAmount",
-          key: "totalAmount",
-          render: (amount: number) => {
-            return new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(amount);
+          {
+            title: "Quantity",
+            dataIndex: "quantity",
+            key: "quantity",
           },
-        },
-      ]}
-      dataSource={selectedInvoiceItems}
-      rowKey="id"
-      pagination={false}
-    />
+          {
+            title: "Price",
+            dataIndex: "price",
+            key: "price",
+            render: (price: number) => {
+              return new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(price);
+            },
+          },
+          {
+            title: "GST",
+            dataIndex: "gstAmount",
+            key: "gstAmount",
+            render: (amount: number) => {
+              return new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(amount);
+            },
+          },
+          {
+            title: "Total",
+            dataIndex: "totalAmount",
+            key: "totalAmount",
+            render: (amount: number) => {
+              return new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(amount);
+            },
+          },
+        ]}
+        dataSource={selectedInvoiceItems}
+        rowKey="id"
+        pagination={false}
+        scroll={{ x: 'max-content' }}
+      />
+    </div>
     <div className="mt-4 text-right">
       <Text strong>Total Amount: </Text>
       <Text strong className="text-lg">

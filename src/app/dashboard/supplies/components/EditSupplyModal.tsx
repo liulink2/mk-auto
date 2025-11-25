@@ -42,7 +42,8 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
     open={visible}
     onCancel={onCancel}
     footer={null}
-    width={1000}
+    width="95%"
+    style={{ maxWidth: 1000 }}
   >
     <Form<Supply>
       form={editForm}
@@ -58,12 +59,12 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           : undefined
       }
     >
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
         <Form.Item
           name="suppliedDate"
           label="Date"
           rules={[{ required: true, message: "Please select a date" }]}
-          className="col-span-2"
+          className="sm:col-span-2"
         >
           <DatePicker style={{ width: "100%" }} />
         </Form.Item>
@@ -71,7 +72,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           name="invoiceNumber"
           label="Invoice Number"
           rules={[{ required: true, message: "Please enter invoice number" }]}
-          className="col-span-4"
+          className="sm:col-span-4"
         >
           <Input />
         </Form.Item>
@@ -79,7 +80,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           name="supplierId"
           label="Supplier"
           rules={[{ required: true, message: "Please select a supplier" }]}
-          className="col-span-4"
+          className="sm:col-span-4"
         >
           <Select
             options={suppliers.map((s) => ({ label: s.name, value: s.id }))}
@@ -89,7 +90,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           name="paymentType"
           label="Payment"
           rules={[{ required: true, message: "Please select payment type" }]}
-          className="col-span-2"
+          className="sm:col-span-2"
         >
           <Select>
             <Select.Option value="CASH">Cash</Select.Option>
@@ -97,12 +98,12 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           </Select>
         </Form.Item>
       </div>
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-12 gap-4">
         <Form.Item
           name="name"
           label="Name"
           rules={[{ required: true, message: "Please enter item name" }]}
-          className="col-span-6"
+          className="col-span-2 sm:col-span-6"
         >
           <Input />
         </Form.Item>
@@ -110,7 +111,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           name="quantity"
           label="Quantity"
           rules={[{ required: true, message: "Please enter quantity" }]}
-          className="col-span-1"
+          className="col-span-1 sm:col-span-1"
         >
           <InputNumber step={1} style={{ width: "100%" }} />
         </Form.Item>
@@ -118,7 +119,7 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           name="price"
           label="Price"
           rules={[{ required: true, message: "Please enter price" }]}
-          className="col-span-2"
+          className="col-span-1 sm:col-span-2"
         >
           <InputNumber
             min={0}
@@ -132,10 +133,10 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
             }
           />
         </Form.Item>
-        <Form.Item name="gstAmount" label="GST" className="col-span-1">
+        <Form.Item name="gstAmount" label="GST" className="col-span-1 sm:col-span-1">
           <InputNumber style={{ width: "100%" }} prefix="$" />
         </Form.Item>
-        <Form.Item name="totalAmount" label="Total" className="col-span-2">
+        <Form.Item name="totalAmount" label="Total" className="col-span-1 sm:col-span-2">
           <InputNumber style={{ width: "100%" }} prefix="$" />
         </Form.Item>
       </div>
