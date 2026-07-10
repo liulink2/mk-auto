@@ -15,7 +15,11 @@ export default withAuth(
   }
 );
 
-// Protect all routes except login and register
+// Protect all routes (incl. API) except login, register, the NextAuth
+// endpoints, and the public signup API. Data API routes were previously
+// excluded via the bare `api` token and served PII/financials with no auth.
 export const config = {
-  matcher: ["/((?!login|register|api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!login|register|api/auth|api/register|_next/static|_next/image|favicon.ico).*)",
+  ],
 };
