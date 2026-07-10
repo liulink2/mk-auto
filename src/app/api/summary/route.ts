@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     if (!month) {
       const carServicesTotal = await prisma.carService.aggregate({
         where: { year },
-        _sum: { totalAmount: true },
+        _sum: { finalAmount: true },
       });
 
       const supplies = await prisma.supply.findMany({
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       });
 
       return NextResponse.json({
-        carServicesTotal: carServicesTotal._sum.totalAmount || 0,
+        carServicesTotal: carServicesTotal._sum.finalAmount || 0,
         suppliesTotal,
         expensesTotal: expensesTotal._sum.amount || 0,
       });
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     // Month + year summary (existing logic)
     const carServicesTotal = await prisma.carService.aggregate({
       where: { month, year },
-      _sum: { totalAmount: true },
+      _sum: { finalAmount: true },
     });
 
     const supplies = await prisma.supply.findMany({
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      carServicesTotal: carServicesTotal._sum.totalAmount || 0,
+      carServicesTotal: carServicesTotal._sum.finalAmount || 0,
       suppliesTotal,
       expensesTotal: expensesTotal._sum.amount || 0,
     });
