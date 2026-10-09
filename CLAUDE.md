@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-`mk-auto` is the management system for **MK Autoteck Centre**, an auto workshop. It tracks car services/invoices, parts & supplies purchasing, suppliers, expenses, and reconciles inventory. Built on Next.js 15 (App Router) + React 19, Prisma + PostgreSQL, NextAuth, Ant Design, and OpenAI vision for invoice extraction.
+`mk-auto` is the management system for **MK Autoteck Centre**, an auto workshop. It tracks car services/invoices, parts & supplies purchasing, suppliers, expenses, and reconciles inventory. Built on Next.js 15 (App Router) + React 19, Prisma + PostgreSQL, NextAuth, Ant Design, and Claude vision (Haiku) for invoice extraction.
 
 ## Commands
 
@@ -27,7 +27,7 @@ There is **no test framework** configured — do not assume `pnpm test` exists.
 
 ## Required env
 
-`DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `OPENAI_API_KEY` (see `.env` / `.env.local`).
+`DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ANTHROPIC_API_KEY` (see `.env` / `.env.local`).
 
 ## Architecture
 
@@ -44,7 +44,7 @@ There is **no test framework** configured — do not assume `pnpm test` exists.
 
 **Inventory reconciliation (the `settled` flag).** Both `Supply` and `CarServiceItem` carry `settled: Boolean`. `Supply.mappedNames` (+ the `supplies/[id]/mapping` route) link purchased supplies to the part names sold on car services. `POST /api/inventory/settle` bulk-marks given `supplyIds` and `carServiceItemIds` as settled. Listing endpoints default to `settled: false` and only include settled rows when `includeSettled=true`.
 
-**OpenAI invoice extraction.** `POST /api/supplies/extract-invoice` sends a base64 image to `gpt-4.1-mini` (vision) with a fixed prompt and parses the returned JSON into supply line items. Model name and prompt are hardcoded in that route.
+**Invoice extraction (Claude).** `POST /api/supplies/extract-invoice` sends a base64 image to `claude-haiku-5-5` with structured output (`output_config.format` JSON schema), so the reply is always schema-valid JSON. The schema's `supplierId` is an enum of active leaf supplier IDs loaded per request, so the model picks a real supplier or `""`. Model name and prompt are hardcoded in that route.
 
 **Client providers.** `src/app/layout.tsx` wraps the tree in `CompanySettingsProvider` → `Providers` (`SessionProvider` + Ant Design `AntdRegistry` + `App`). The React 19 compatibility shim `@ant-design/v5-patch-for-react-19` is imported once in the root layout — keep it.
 
