@@ -105,6 +105,8 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
           className="sm:col-span-4"
         >
           <Select
+            showSearch
+            optionFilterProp="label"
             options={suppliers
               .filter((supplier) => supplier.children.length === 0)
               .map((s) => ({

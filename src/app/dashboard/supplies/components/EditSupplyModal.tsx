@@ -83,6 +83,8 @@ export const EditSupplyModal: React.FC<EditSupplyModalProps> = ({
           className="sm:col-span-4"
         >
           <Select
+            showSearch
+            optionFilterProp="label"
             options={suppliers.map((s) => ({ label: s.name, value: s.id }))}
           />
         </Form.Item>

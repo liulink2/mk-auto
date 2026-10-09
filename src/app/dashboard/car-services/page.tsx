@@ -31,7 +31,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { debounce } from "lodash";
 import { Supply } from "@prisma/client";
 import { useCompanySettings } from "@/contexts/CompanySettingsContext";
-import { CarService } from "./types";
+import { CarService, CarSuggestion, CarSuggestionField } from "./types";
 import CarServiceForm from "./components/CarServiceForm";
 import CarServiceTable from "./components/CarServiceTable";
 import CarServiceInvoiceModal from "./components/CarServiceInvoiceModal";
@@ -51,6 +51,9 @@ export default function CarServicesPage() {
   const [form] = Form.useForm();
   const [selectedMonthYear, setSelectedMonthYear] = useState(dayjs());
   const [supplyNames, setSupplyNames] = useState<string[]>([]);
+  const [carSuggestions, setCarSuggestions] = useState<
+    Partial<Record<CarSuggestionField, CarSuggestion[]>>
+  >({});
   const [loading, setLoading] = useState(true);
 
   const fetchCarServices = useCallback(
@@ -89,12 +92,41 @@ export default function CarServicesPage() {
     }
   }, 300);
 
+  const debouncedFetchCarSuggestions = useMemo(
+    () =>
+      debounce(async (field: CarSuggestionField, searchText: string) => {
+        if (searchText.trim().length < 2) {
+          setCarSuggestions((prev) => ({ ...prev, [field]: [] }));
+          return;
+        }
+        try {
+          const params = new URLSearchParams({ field, q: searchText });
+          const response = await fetch(
+            `/api/car-services/suggestions?${params}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch car suggestions");
+          }
+          const data: CarSuggestion[] = await response.json();
+          setCarSuggestions((prev) => ({ ...prev, [field]: data }));
+        } catch (error) {
+          console.error("Failed to fetch car suggestions:", error);
+        }
+      }, 300),
+    []
+  );
+
+  useEffect(() => () => debouncedFetchCarSuggestions.cancel(), [
+    debouncedFetchCarSuggestions,
+  ]);
+
   useEffect(() => {
     fetchCarServices(selectedMonthYear);
   }, [selectedMonthYear, fetchCarServices]);
 
   const handleAdd = () => {
     setEditingCarService(null);
+    setCarSuggestions({});
     form.resetFields();
     form.setFieldsValue({
       carInDateTime: dayjs(),
@@ -511,6 +543,8 @@ export default function CarServicesPage() {
           form={form}
           supplyNames={supplyNames}
           debouncedFetchSupplyNames={debouncedFetchSupplyNames}
+          carSuggestions={carSuggestions}
+          debouncedFetchCarSuggestions={debouncedFetchCarSuggestions}
           handleValuesChange={handleValuesChange}
         />
       </Modal>
