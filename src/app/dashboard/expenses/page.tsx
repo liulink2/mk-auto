@@ -176,7 +176,7 @@ export default function ExpenseManagementPage() {
     expenseForm.setFieldsValue({
       issuedDate: dayjs(),
       name: "",
-      amount: 0,
+      amount: undefined,
       paymentType: "CASH",
       description: "",
     });

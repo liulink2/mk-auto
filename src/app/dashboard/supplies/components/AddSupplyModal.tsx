@@ -67,7 +67,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
       onValuesChange={handleValuesChange}
       initialValues={{
         paymentType: "CASH",
-        items: [{ name: "", description: "", quantity: 1, price: 0 }],
+        items: [{ name: "", description: "" }],
       }}
     >
       <div className="mb-4">
@@ -155,13 +155,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
                     ]}
                     className="col-span-1 sm:col-span-1"
                   >
-                    <InputNumber
-                      step={1}
-                      style={{ width: "100%" }}
-                      parser={(value: string | undefined) =>
-                        value ? parseInt(value) : 0
-                      }
-                    />
+                    <InputNumber step={1} precision={0} style={{ width: "100%" }} />
                   </Form.Item>
                   <Form.Item
                     {...restField}
@@ -205,7 +199,7 @@ export const AddSupplyModal: React.FC<AddSupplyModalProps> = ({
             <Form.Item>
               <Button
                 type="dashed"
-                onClick={() => add({ name: "", quantity: 1, price: 0 })}
+                onClick={() => add({ name: "" })}
                 block
                 icon={<PlusOutlined />}
               >

@@ -3,10 +3,10 @@ import { Dayjs } from "dayjs";
 export interface SupplyItem {
   name: string;
   description?: string;
-  quantity: number;
-  price: number;
-  totalAmount: number;
-  gstAmount: number;
+  quantity?: number;
+  price?: number;
+  totalAmount?: number;
+  gstAmount?: number;
 }
 
 export interface Supplier {
