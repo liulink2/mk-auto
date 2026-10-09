@@ -8,6 +8,13 @@ export interface CarServiceItem {
   settled: boolean;
 }
 
+export type CarSuggestionField = "carPlate" | "ownerName" | "phoneNo";
+
+export type CarSuggestion = Pick<
+  CarService,
+  "carPlate" | "ownerName" | "phoneNo" | "carDetails"
+>;
+
 export interface CarService {
   id: string;
   carPlate: string;

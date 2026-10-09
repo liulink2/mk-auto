@@ -14,12 +14,17 @@ import {
   CheckOutlined,
 } from "@ant-design/icons";
 import React from "react";
-import { CarService } from "../types";
+import { CarService, CarSuggestion, CarSuggestionField } from "../types";
 
 interface CarServiceFormProps {
   form: FormInstance<CarService>;
   supplyNames: string[];
   debouncedFetchSupplyNames: (searchText: string) => void;
+  carSuggestions: Partial<Record<CarSuggestionField, CarSuggestion[]>>;
+  debouncedFetchCarSuggestions: (
+    field: CarSuggestionField,
+    searchText: string
+  ) => void;
   handleValuesChange: (_: Partial<CarService>, values: CarService) => void;
 }
 
@@ -27,8 +32,39 @@ const CarServiceForm: React.FC<CarServiceFormProps> = ({
   form,
   supplyNames,
   debouncedFetchSupplyNames,
+  carSuggestions,
+  debouncedFetchCarSuggestions,
   handleValuesChange,
 }) => {
+  // Picking a past car fills plate, owner and phone from its latest visit.
+  const renderCarAutoComplete = (field: CarSuggestionField) => (
+    <AutoComplete
+      options={(carSuggestions[field] ?? []).map((suggestion) => ({
+        key: suggestion.carPlate,
+        value: suggestion[field] ?? "",
+        label: (
+          <div>
+            <div>
+              {suggestion.carPlate} - {suggestion.ownerName}
+            </div>
+            <div className="text-xs text-gray-500">
+              {[suggestion.phoneNo, suggestion.carDetails]
+                .filter(Boolean)
+                .join(" | ")}
+            </div>
+          </div>
+        ),
+        suggestion,
+      }))}
+      filterOption={false}
+      onSearch={(searchText) => debouncedFetchCarSuggestions(field, searchText)}
+      onSelect={(_, option) => {
+        const { carPlate, ownerName, phoneNo } = option.suggestion;
+        form.setFieldsValue({ carPlate, ownerName, phoneNo });
+      }}
+    />
+  );
+
   return (
     <Form<CarService>
       form={form}
@@ -42,7 +78,7 @@ const CarServiceForm: React.FC<CarServiceFormProps> = ({
           label="Car Plate"
           rules={[{ required: true }]}
         >
-          <Input />
+          {renderCarAutoComplete("carPlate")}
         </Form.Item>
 
         <Form.Item
@@ -50,11 +86,11 @@ const CarServiceForm: React.FC<CarServiceFormProps> = ({
           label="Owner Name"
           rules={[{ required: true }]}
         >
-          <Input />
+          {renderCarAutoComplete("ownerName")}
         </Form.Item>
 
         <Form.Item name="phoneNo" label="Phone No" rules={[{ required: true }]}>
-          <Input />
+          {renderCarAutoComplete("phoneNo")}
         </Form.Item>
 
         <Form.Item name="carDetails" label="Car Details" className="col-span-2">
