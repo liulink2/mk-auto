@@ -58,7 +58,7 @@ export default function SupplyManagementPage() {
       supplierId: undefined,
       paymentType: "CASH",
       remarks: "",
-      items: [{ name: "", description: "", quantity: 1, price: 0 }],
+      items: [{ name: "", description: "" }],
     });
     setIsAddModalVisible(true);
   };
@@ -125,16 +125,27 @@ export default function SupplyManagementPage() {
     if (allValues.items) {
       let totalAmount = 0;
       let totalGstAmount = 0;
+      let hasPricedItem = false;
       allValues.items.forEach((item) => {
+        if (item.price == null || item.quantity == null) {
+          item.gstAmount = undefined;
+          item.totalAmount = undefined;
+          return;
+        }
         const itemPrice = item.price * item.quantity;
         item.gstAmount = Math.round(itemPrice * 0.1 * 100) / 100;
         item.totalAmount = Math.round((itemPrice + item.gstAmount) * 100) / 100;
         totalAmount += item.totalAmount;
         totalGstAmount += item.gstAmount;
+        hasPricedItem = true;
       });
       addForm.setFieldsValue({
-        totalAmount: Math.round(totalAmount * 100) / 100,
-        totalGstAmount: Math.round(totalGstAmount * 100) / 100,
+        totalAmount: hasPricedItem
+          ? Math.round(totalAmount * 100) / 100
+          : undefined,
+        totalGstAmount: hasPricedItem
+          ? Math.round(totalGstAmount * 100) / 100
+          : undefined,
         items: allValues.items,
       });
     }
