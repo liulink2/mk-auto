@@ -220,21 +220,24 @@ export default function SupplyManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageBase64 }),
       });
-      if (!response.ok) throw new Error("Failed to extract invoice data");
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || !Array.isArray(body.data?.items)) {
+        throw new Error(body.error || "Failed to extract invoice data");
+      }
 
-      const { data }: { data: SupplyFormValues } = await response.json();
+      const data: SupplyFormValues = body.data;
       const totalGstAmount = data.items.reduce(
-        (sum, item) => sum + Number(item.gstAmount) || 0,
+        (sum, item) => sum + (Number(item.gstAmount) || 0),
         0
       );
       const totalAmount = data.items.reduce(
-        (sum, item) => sum + Number(item.totalAmount) || 0,
+        (sum, item) => sum + (Number(item.totalAmount) || 0),
         0
       );
 
       addForm.setFieldsValue({
         invoiceNumber: data.invoiceNumber,
-        supplierId: data.supplierId,
+        supplierId: data.supplierId || undefined,
         suppliedDate: data.suppliedDate ? dayjs(data.suppliedDate) : undefined,
         paymentType: data.paymentType || "CARD",
         items: data.items.map((item) => ({
@@ -249,8 +252,10 @@ export default function SupplyManagementPage() {
         totalGstAmount: totalGstAmount,
       });
       message.success("Invoice data extracted successfully");
-    } catch {
-      message.error("Failed to extract invoice data");
+    } catch (error) {
+      message.error(
+        error instanceof Error ? error.message : "Failed to extract invoice data"
+      );
     } finally {
       setUploading(false);
     }
