@@ -17,6 +17,8 @@ Extract the data from this supplier invoice.
 - invoiceNumber: the invoice number as printed, empty string if not found.
 - supplierId: the id of the supplier below that issued this invoice, empty string if none match.
 - suppliedDate: the invoice date as YYYY-MM-DD, empty string if not found.
+  These are Australian invoices: printed dates are day first (DD/MM/YY or DD/MM/YYYY),
+  so 06/09/26 is 6 September 2026, never 9 June.
 - items: one entry per invoice line. Use plain numbers (no currency symbols).
   quantity is the line quantity, price is the unit price, gstAmount is the GST for the line,
   totalAmount is the line total. Use 0 for any amount that is not shown.
@@ -36,7 +38,8 @@ const buildSchema = (supplierIds: string[]) => ({
     supplierId: { type: "string", enum: [...supplierIds, ""] },
     suppliedDate: {
       type: "string",
-      description: "YYYY-MM-DD, empty string if unknown",
+      description:
+        "YYYY-MM-DD, empty string if unknown. The invoice prints dates day first (DD/MM/YY).",
     },
     items: {
       type: "array",
