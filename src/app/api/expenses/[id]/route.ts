@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { shopMonthYear } from "@/lib/shop-month";
 
 type Params = Promise<{ id: string }>;
 
@@ -15,8 +16,7 @@ export async function PUT(
       where: { id },
       data: {
         ...body,
-        month: new Date(body.issuedDate).getMonth() + 1,
-        year: new Date(body.issuedDate).getFullYear(),
+        ...shopMonthYear(new Date(body.issuedDate)),
       },
     });
     return NextResponse.json(expense);

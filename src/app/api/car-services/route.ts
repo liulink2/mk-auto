@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { shopMonthYear } from "@/lib/shop-month";
 import { CarServiceItem } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
@@ -51,8 +52,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...rest,
         carInDateTime,
-        year: carInDateTime.getFullYear(),
-        month: carInDateTime.getMonth() + 1,
+        ...shopMonthYear(carInDateTime),
         carOutDateTime: body.carOutDateTime
           ? new Date(body.carOutDateTime)
           : null,
