@@ -11,7 +11,7 @@ import {
   App,
   Form,
 } from "antd";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { PlusOutlined } from "@ant-design/icons";
 import { Supply, SupplyFormValues } from "./types";
 import { useSupplies } from "./hooks/useSupplies";
@@ -72,6 +72,16 @@ export default function SupplyManagementPage() {
     setIsEditModalVisible(true);
   };
 
+  // Saved records only show under their own month, so jump the list there.
+  const showSavedMonth = (savedDate: Dayjs) => {
+    if (savedDate.isSame(date, "month")) {
+      fetchSupplies(date);
+      return;
+    }
+    setDate(savedDate);
+    message.info(`Showing ${savedDate.format("MMMM YYYY")}, the month you saved to`);
+  };
+
   const handleAddCancel = () => {
     setIsAddModalVisible(false);
     addForm.resetFields();
@@ -110,7 +120,7 @@ export default function SupplyManagementPage() {
       message.success("Supplies created successfully");
       setIsAddModalVisible(false);
       addForm.resetFields();
-      fetchSupplies(date);
+      showSavedMonth(values.suppliedDate);
     } catch {
       message.error("Failed to create supplies");
     } finally {
@@ -184,7 +194,7 @@ export default function SupplyManagementPage() {
       if (!response.ok) throw new Error("Failed to update supply");
       message.success("Supply updated successfully");
       setIsEditModalVisible(false);
-      fetchSupplies(date);
+      showSavedMonth(value.suppliedDate);
     } catch {
       message.error("Failed to update supply");
     } finally {
@@ -226,6 +236,7 @@ export default function SupplyManagementPage() {
       }
 
       const data: SupplyFormValues = body.data;
+      const extractedDate = data.suppliedDate ? dayjs(data.suppliedDate) : undefined;
       const totalGstAmount = data.items.reduce(
         (sum, item) => sum + (Number(item.gstAmount) || 0),
         0
@@ -238,7 +249,7 @@ export default function SupplyManagementPage() {
       addForm.setFieldsValue({
         invoiceNumber: data.invoiceNumber,
         supplierId: data.supplierId || undefined,
-        suppliedDate: data.suppliedDate ? dayjs(data.suppliedDate) : undefined,
+        suppliedDate: extractedDate,
         paymentType: data.paymentType || "CARD",
         items: data.items.map((item) => ({
           name: item.name,
@@ -252,6 +263,17 @@ export default function SupplyManagementPage() {
         totalGstAmount: totalGstAmount,
       });
       message.success("Invoice data extracted successfully");
+      const earliestExpected = dayjs().subtract(1, "month").startOf("month");
+      if (
+        extractedDate &&
+        (extractedDate.isBefore(earliestExpected) ||
+          extractedDate.isAfter(dayjs(), "day"))
+      ) {
+        message.warning(
+          `Invoice date read as ${extractedDate.format("DD/MM/YYYY")}. Check it before saving.`,
+          6
+        );
+      }
     } catch (error) {
       message.error(
         error instanceof Error ? error.message : "Failed to extract invoice data"
