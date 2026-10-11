@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { shopMonthYear } from "@/lib/shop-month";
 
 // GET /api/expenses
 export async function GET(request: NextRequest) {
@@ -39,8 +40,7 @@ export async function POST(request: NextRequest) {
     const expense = await prisma.expense.create({
       data: {
         ...body,
-        month: new Date(body.issuedDate).getMonth() + 1,
-        year: new Date(body.issuedDate).getFullYear(),
+        ...shopMonthYear(new Date(body.issuedDate)),
       },
     });
     return NextResponse.json(expense);

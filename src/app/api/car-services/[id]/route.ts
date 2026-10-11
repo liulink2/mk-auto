@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { shopMonthYear } from "@/lib/shop-month";
 import { CarServiceItem } from "@prisma/client";
 
 type Params = Promise<{ id: string }>;
@@ -24,8 +25,7 @@ export async function PUT(
         carOutDateTime: body.carOutDateTime
           ? new Date(body.carOutDateTime)
           : null,
-        year: carInDateTime.getFullYear(),
-        month: carInDateTime.getMonth() + 1,
+        ...shopMonthYear(carInDateTime),
       },
     });
 
